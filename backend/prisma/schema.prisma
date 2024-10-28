@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Folder {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  files     File[]
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model File {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  content     Bytes    // Store file content as binary
+  mimeType    String   // Store the file's MIME type
+  uploadDate  DateTime @default(now())
+  fileType    String
+  fileSize    Int
+  fromWebsite Boolean
+  folder      Folder   @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId    String
+
+  @@index([folderId])
+}
+
+model Contact {
+  id          Int        @id @default(autoincrement())
+  createdAt   DateTime   @default(now())
+  name        String
+  address     String?
+  phone       String?
+  mobile      String?
+  email       String?
+  maintenence String?
+  dataId      String?    @map("data_id")
+  ic          String?
+  dic         String?
+  bankAccount String?    @map("bank_account")
+  officeHours OfficeHours[]
+  lastUpdated DateTime   @updatedAt @map("last_updated")
+  employees   Employee[]
+
+  @@map("contact")
+}
+
+model OfficeHours {
+  id          Int             @id @default(autoincrement())
+  days        String
+  time        String
+  contact     Contact         @relation(fields: [contactId], references: [id])
+  contactId   Int             @map("contactId")
+}
+
+model Employee {
+  id             Int          @id @default(autoincrement())
+  name           String
+  position       String?
+  phone          String?
+  email          String?
+  contact         Contact     @relation(fields: [contactId], references: [id])
+  contactId      Int          @map("contactId")
+
+  @@map("employees")
+}
