@@ -1,27 +1,5 @@
-/*import React from 'react';
-
-const Contacts: React.FC = () => {
-  return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-      <h2>Contact Information</h2>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '20px',
-        borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        marginTop: '20px'
-      }}>
-        <h3>Contact Us</h3>
-        <p>This is the contacts page. Add your contact information here.</p>
-      </div>
-    </div>
-  );
-};
-
-export default Contacts;*/
-
 import { useState, useEffect } from 'react';
-import { Phone, Mail, MapPin, Building2, CreditCard, Clock, Users } from 'lucide-react';
+import { Phone, Mail, MapPin, Building2, CreditCard, Clock, Users, Wrench, FileText, Landmark } from 'lucide-react';
 import axiosInstance from '../services/axiosInstance';
 
 interface OfficeHours {
@@ -66,7 +44,7 @@ const Contacts = () => {
         const response = await axiosInstance.get('/api/contact');
         setContact(response.data);
       } catch (err) {
-        setError('Failed to load contact information');
+        setError('Nepodařilo se načíst kontaktní informace');
         console.error('Error fetching contact:', err);
       } finally {
         setIsLoading(false);
@@ -95,14 +73,14 @@ const Contacts = () => {
   if (!contact) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="text-gray-500">No contact information available</div>
+        <div className="text-gray-500">Kontaktní informace nejsou k dispozici</div>
       </div>
     );
   }
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
-      {/* Main Contact Information */}
+      {/* Hlavní kontaktní informace */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-2xl font-bold mb-6">{contact.name}</h2>
         <div className="grid md:grid-cols-2 gap-6">
@@ -111,7 +89,7 @@ const Contacts = () => {
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-gray-600 mt-1" />
                 <div>
-                  <div className="font-medium text-gray-700">Address</div>
+                  <div className="font-medium text-gray-700">Adresa</div>
                   <div className="text-gray-600">{contact.address}</div>
                 </div>
               </div>
@@ -121,9 +99,9 @@ const Contacts = () => {
               <div className="flex items-start gap-3">
                 <Phone className="w-5 h-5 text-gray-600 mt-1" />
                 <div>
-                  <div className="font-medium text-gray-700">Contact</div>
+                  <div className="font-medium text-gray-700">Kontakt</div>
                   {contact.phone && <div className="text-gray-600">Tel: {contact.phone}</div>}
-                  {contact.mobile && <div className="text-gray-600">Mobile: {contact.mobile}</div>}
+                  {contact.mobile && <div className="text-gray-600">Mobil: {contact.mobile}</div>}
                 </div>
               </div>
             )}
@@ -137,14 +115,34 @@ const Contacts = () => {
                 </div>
               </div>
             )}
+
+            {contact.maintenence && (
+              <div className="flex items-start gap-3">
+                <Wrench className="w-5 h-5 text-gray-600 mt-1" />
+                <div>
+                  <div className="font-medium text-gray-700">Údržba</div>
+                  <div className="text-gray-600">{contact.maintenence}</div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-4">
+            {contact.data_id && (
+              <div className="flex items-start gap-3">
+                <FileText className="w-5 h-5 text-gray-600 mt-1" />
+                <div>
+                  <div className="font-medium text-gray-700">Datová schránka</div>
+                  <div className="text-gray-600">{contact.data_id}</div>
+                </div>
+              </div>
+            )}
+
             {(contact.ic || contact.dic) && (
               <div className="flex items-start gap-3">
                 <Building2 className="w-5 h-5 text-gray-600 mt-1" />
                 <div>
-                  <div className="font-medium text-gray-700">Registration</div>
+                  <div className="font-medium text-gray-700">Identifikace</div>
                   {contact.ic && <div className="text-gray-600">IČ: {contact.ic}</div>}
                   {contact.dic && <div className="text-gray-600">DIČ: {contact.dic}</div>}
                 </div>
@@ -153,9 +151,9 @@ const Contacts = () => {
 
             {contact.bank_account && (
               <div className="flex items-start gap-3">
-                <CreditCard className="w-5 h-5 text-gray-600 mt-1" />
+                <Landmark className="w-5 h-5 text-gray-600 mt-1" />
                 <div>
-                  <div className="font-medium text-gray-700">Bank Account</div>
+                  <div className="font-medium text-gray-700">Bankovní spojení</div>
                   <div className="text-gray-600">{contact.bank_account}</div>
                 </div>
               </div>
@@ -164,12 +162,12 @@ const Contacts = () => {
         </div>
       </div>
 
-      {/* Office Hours */}
+      {/* Úřední hodiny */}
       {contact.officeHours?.length > 0 && (
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center gap-2 mb-4">
             <Clock className="w-5 h-5 text-gray-600" />
-            <h2 className="text-xl font-semibold">Office Hours</h2>
+            <h2 className="text-xl font-semibold">Úřední hodiny</h2>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             {contact.officeHours.map((hours) => (
@@ -182,12 +180,12 @@ const Contacts = () => {
         </div>
       )}
 
-      {/* Employees */}
+      {/* Zaměstnanci */}
       {contact.employees?.length > 0 && (
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center gap-2 mb-4">
             <Users className="w-5 h-5 text-gray-600" />
-            <h2 className="text-xl font-semibold">Employees</h2>
+            <h2 className="text-xl font-semibold">Zaměstnanci</h2>
           </div>
           <div className="grid gap-4">
             {contact.employees.map((employee) => (
@@ -217,7 +215,7 @@ const Contacts = () => {
       )}
 
       <div className="text-sm text-gray-500 text-right">
-        Last updated: {new Date(contact.last_updated).toLocaleString()}
+        Poslední aktualizace: {new Date(contact.last_updated).toLocaleString()}
       </div>
     </div>
   );
