@@ -1,174 +1,6 @@
 /*import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../services/axiosInstance';
-import MoveFile from '../components/Movefile';
-
-interface PDF {
-  id: string;
-  name: string;
-  description: string;
-  folder: string;
-}
-
-const FolderContent: React.FC = () => {
-  const [selectedFile, setSelectedFile] = useState<{id: string, name: string} | null>(null);
-  const { folderName } = useParams<{ folderName: string }>();
-  const navigate = useNavigate();
-  const [files, setFiles] = useState<PDF[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchFolderContent = async () => {
-    if (!folderName) return;
-    
-    try {
-      setIsLoading(true);
-      const response = await axiosInstance.get<{ name: string; files: PDF[] }[]>('/api/folders');
-      const folder = response.data.find(f => f.name === decodeURIComponent(folderName));
-      if (folder) {
-        setFiles(folder.files);
-      } else {
-        setError('Folder not found');
-      }
-    } catch (error) {
-      console.error('Error fetching folder content:', error);
-      setError(`Failed to load folder content. ${error instanceof Error ? error.message : String(error)}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchFolderContent();
-  }, [folderName]);
-
-  const handleDownload = async (id: string) => {
-    try {
-      const response = await axiosInstance.get<{ downloadUrl: string }>(
-        `/api/pdfs/${folderName}/${id}/download`
-      );
-      
-      if (!response.data.downloadUrl) {
-        throw new Error('No download URL provided');
-      }
-      
-      window.open(response.data.downloadUrl, '_blank');
-    } catch (error) {
-      console.error('Error downloading PDF:', error);
-      alert(`Failed to download PDF. ${error instanceof Error ? error.message : String(error)}`);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      await axiosInstance.delete(`/api/pdfs/${folderName}/${id}`);
-      alert('PDF deleted successfully');
-      fetchFolderContent();
-    } catch (error) {
-      console.error('Error deleting PDF:', error);
-      alert('Failed to delete PDF. Please try again.');
-    }
-  };
-
-  if (isLoading) {
-    return <div>Loading folder content...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  return (
-    <div style={{ marginTop: '20px' }}>
-      <div style={{ marginBottom: '20px' }}>
-        <button
-          onClick={() => navigate('/')}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#6c757d',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          Back to Folders
-        </button>
-      </div>
-
-      <h2>{decodeURIComponent(folderName === undefined ? "" : folderName)}</h2>
-      
-      {files.length === 0 ? (
-        <p>This folder is empty.</p>
-      ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-        {files.map((pdf) => (
-          <li key={pdf.id} style={{ marginBottom: '20px', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}>
-            <h4 style={{ fontSize: '18px', marginBottom: '5px' }}>{pdf.name}</h4>
-            <p style={{ color: '#666', marginBottom: '10px' }}>{pdf.description}</p>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button
-                onClick={() => handleDownload(pdf.id)}
-                style={{
-                  backgroundColor: '#007bff',
-                  color: 'white',
-                  padding: '8px 16px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                Download
-              </button>
-              <button
-                onClick={() => handleDelete(pdf.id)}
-                style={{
-                  backgroundColor: '#dc3545',
-                  color: 'white',
-                  padding: '8px 16px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                Delete
-              </button>
-              <button
-                onClick={() => setSelectedFile({ id: pdf.id, name: pdf.name })}
-                style={{
-                  backgroundColor: '#6c757d',
-                  color: 'white',
-                  padding: '8px 16px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                Move
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
-
-      {selectedFile && (
-        <MoveFile
-          fileId={selectedFile.id}
-          fileName={selectedFile.name}
-          currentFolder={folderName!}
-          onClose={() => setSelectedFile(null)}
-        />
-      )}
-    </div>
-  );
-};
-
-
-export default FolderContent;*/
-
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axiosInstance from '../services/axiosInstance';
 import Movefile from '../components/Movefile';
 
 interface PDF {
@@ -403,6 +235,203 @@ const FolderContent: React.FC = () => {
                   >
                     Delete
                   </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {selectedFile && (
+        <Movefile
+          fileId={selectedFile.id}
+          fileName={selectedFile.name}
+          currentFolder={folderName!}
+          onClose={() => setSelectedFile(null)}
+        />
+      )}
+    </div>
+  );
+};
+
+export default FolderContent;*/
+
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import { isAdminState } from '../atoms/atoms';
+import axiosInstance from '../services/axiosInstance';
+import Movefile from '../components/Movefile';
+
+interface PDF {
+  id: string;
+  name: string;
+  description: string;
+  folder: string;
+  fileSize: number;
+  fileType: string;
+}
+
+const FolderContent: React.FC = () => {
+  const { folderName } = useParams<{ folderName: string }>();
+  const navigate = useNavigate();
+  const isAdmin = useRecoilValue(isAdminState);
+  const [files, setFiles] = useState<PDF[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<{id: string, name: string} | null>(null);
+
+  const fetchFolderContent = async () => {
+    if (!folderName) return;
+    
+    try {
+      setIsLoading(true);
+      const response = await axiosInstance.get<{ name: string; files: PDF[] }[]>('/api/folders');
+      const folder = response.data.find(f => f.name === decodeURIComponent(folderName));
+      if (folder) {
+        setFiles(folder.files || []);
+      } else {
+        setError('Folder not found');
+      }
+    } catch (error) {
+      console.error('Error fetching folder content:', error);
+      setError(`Failed to load folder content. ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchFolderContent();
+  }, [folderName]);
+
+  const handleDownload = async (id: string) => {
+    try {
+      const response = await axiosInstance.get(`/api/pdfs/${folderName}/${id}/download`, {
+        responseType: 'blob'
+      });
+  
+      const blob = new Blob([response.data], { 
+        type: response.headers['content-type'] 
+      });
+      const url = window.URL.createObjectURL(blob);
+  
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', response.headers['content-disposition']
+        ? response.headers['content-disposition'].split('filename=')[1].replace(/"/g, '')
+        : 'download');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+  
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      alert('Failed to download file. Please try again.');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this file?')) {
+      try {
+        await axiosInstance.delete(`/api/pdfs/${folderName}/${id}`);
+        await fetchFolderContent();
+      } catch (error) {
+        console.error('Error deleting PDF:', error);
+        alert('Failed to delete PDF. Please try again.');
+      }
+    }
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-48">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 mx-4 text-red-700 bg-red-100 rounded-md">
+        Error: {error}
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 max-w-6xl mx-auto">
+      <div className="mb-6 flex items-center">
+        <button
+          onClick={() => navigate('/')}
+          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-sm flex items-center transition-colors"
+        >
+          ← Back to Folders
+        </button>
+      </div>
+
+      <div className="bg-white rounded-lg shadow">
+        <h2 className="text-2xl font-bold p-6 border-b">
+          {decodeURIComponent(folderName || '')}
+        </h2>
+
+        {files.length === 0 ? (
+          <div className="text-center p-10 text-gray-500">
+            This folder is empty
+          </div>
+        ) : (
+          <div className="divide-y">
+            {files.map((file) => (
+              <div
+                key={file.id}
+                className="p-6 hover:bg-gray-50 transition-colors"
+              >
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold mb-2">
+                    {file.name}
+                  </h3>
+                  <p className="text-gray-600 mb-2">
+                    {file.description}
+                  </p>
+                  <div className="flex gap-4 text-sm text-gray-500">
+                    <span>Size: {formatFileSize(file.fileSize)}</span>
+                    <span>Type: {file.fileType.toUpperCase()}</span>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleDownload(file.id)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    Download
+                  </button>
+                  
+                  {isAdmin && (
+                    <>
+                      <button
+                        onClick={() => setSelectedFile({ id: file.id, name: file.name })}
+                        className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                      >
+                        Move
+                      </button>
+                      <button
+                        onClick={() => handleDelete(file.id)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
