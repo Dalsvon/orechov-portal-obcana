@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import { isAdminState } from '../atoms/atoms';
 import axiosInstance from '../services/axiosInstance';
-import PDFUploader from '../components/FileUploader';
+import FileUploader from '../components/FileUploader';
 
 const AdminPage = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -54,7 +54,7 @@ const AdminPage = () => {
         {/* PDF Uploader Section */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-bold mb-6">Nahrát dokument</h2>
-          <PDFUploader />
+          <FileUploader onUploadComplete={() => {}} />
         </div>
 
         {/* Admin Controls Section */}
