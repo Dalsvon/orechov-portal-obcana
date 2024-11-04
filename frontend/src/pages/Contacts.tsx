@@ -24,11 +24,11 @@ interface Contact {
   mobile: string | null;
   email: string | null;
   maintenence: string | null;
-  data_id: string | null;
+  dataId: string | null;
   ic: string | null;
   dic: string | null;
-  bank_account: string | null;
-  last_updated: string;
+  bankAccount: string | null;
+  lastUpdated: string;
   officeHours: OfficeHours[];
   employees: Employee[];
 }
@@ -128,12 +128,12 @@ const Contacts = () => {
           </div>
 
           <div className="space-y-4">
-            {contact.data_id && (
+            {contact.dataId && (
               <div className="flex items-start gap-3">
                 <FileText className="w-5 h-5 text-gray-600 mt-1" />
                 <div>
                   <div className="font-medium text-gray-700">Datová schránka</div>
-                  <div className="text-gray-600">{contact.data_id}</div>
+                  <div className="text-gray-600">{contact.dataId}</div>
                 </div>
               </div>
             )}
@@ -149,12 +149,12 @@ const Contacts = () => {
               </div>
             )}
 
-            {contact.bank_account && (
+            {contact.bankAccount && (
               <div className="flex items-start gap-3">
                 <Landmark className="w-5 h-5 text-gray-600 mt-1" />
                 <div>
                   <div className="font-medium text-gray-700">Bankovní spojení</div>
-                  <div className="text-gray-600">{contact.bank_account}</div>
+                  <div className="text-gray-600">č.ú.: {contact.bankAccount}</div>
                 </div>
               </div>
             )}
@@ -215,7 +215,7 @@ const Contacts = () => {
       )}
 
       <div className="text-sm text-gray-500 text-right">
-        Poslední aktualizace: {new Date(contact.last_updated).toLocaleString()}
+        Poslední aktualizace: {new Date(contact.lastUpdated).toLocaleString()}
       </div>
     </div>
   );

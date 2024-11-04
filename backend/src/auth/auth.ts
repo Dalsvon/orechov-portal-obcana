@@ -43,8 +43,6 @@ export const sessionMiddleware = session({
   });
 
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction): void => {
-    console.log('Session:', req.session);
-    console.log('Is Admin:', req.session.isAdmin);
     
     if (req.session.isAdmin) {
       next();
@@ -103,8 +101,6 @@ router.post(
 
       req.session.isAdmin = true;
       res.json({ message: 'Logged in successfully' });
-      console.log('Session:', req.session);
-      console.log('Is Admin:', req.session.isAdmin);
     } catch (error) {
       console.error('Login error:', error);
       res.status(500).json({ error: 'An error occurred during login' });
