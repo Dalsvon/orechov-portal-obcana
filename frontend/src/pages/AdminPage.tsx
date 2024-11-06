@@ -56,8 +56,6 @@ const AdminPage = () => {
           <h2 className="text-2xl font-bold mb-6">Nahrát dokument</h2>
           <FileUploader onUploadComplete={() => {}} />
         </div>
-
-        {/* Admin Controls Section */}
         <div className="space-y-8">
           {/* Password Change Form */}
           <div className="bg-white rounded-lg shadow-md p-6">

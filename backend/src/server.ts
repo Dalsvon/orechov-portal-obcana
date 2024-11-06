@@ -13,13 +13,12 @@ import authRouter, { sessionMiddleware, initializeAdmin, isAuthenticated } from 
 
 const app = express();
 
-// Configure CORS to handle binary data
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'], // Added Cookie explicitly
-  exposedHeaders: ['Set-Cookie', 'Content-Disposition'] // Added Set-Cookie explicitly
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  exposedHeaders: ['Set-Cookie', 'Content-Disposition']
 }));
 
 app.use(sessionMiddleware);
@@ -27,6 +26,7 @@ app.use(sessionMiddleware);
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+// Limits upload size for all files 
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -37,9 +37,10 @@ const upload = multer({
 // Error handling middleware
 const errorHandler: express.ErrorRequestHandler = (err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ error: 'An unexpected error occurred' });
+  res.status(500).json({ error: 'Nastala neočekávaná chyba na strane serveru' });
 };
 
+// Router for authentication functions
 app.use('/api/auth', authRouter);
 
 // Routes
@@ -63,7 +64,3 @@ initializeAdmin().then(() => {
     console.log(`Server running on port ${PORT}`);
   });
 });
-
-function cookieParser(): any {
-  throw new Error('Function not implemented.');
-}

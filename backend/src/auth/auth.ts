@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import express from 'express';
-import session from 'express-session';
+import cookieSession from 'cookie-session';
 import bcrypt from 'bcrypt';
 import prisma from '../database/prisma';
 
-// Define interfaces for request/response types
 interface LoginRequest {
   username: string;
   password: string;
@@ -20,37 +19,37 @@ interface AuthResponse {
   error?: string;
 }
 
-declare module 'express-session' {
-  interface SessionData {
-    isAdmin: boolean;
+declare module 'express' {
+  interface Request {
+    session: {
+      isAdmin?: boolean;
+      [key: string]: any;
+    } | null;
   }
 }
 
 const router = express.Router();
 
-export const sessionMiddleware = session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    name: 'connect.sid', // Explicitly set the cookie name
-    cookie: {
-      secure: false,
-      httpOnly: true,
-      sameSite: 'lax',
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      path: '/' // Ensure cookie is sent for all paths
-    }
-  });
+export const sessionMiddleware = cookieSession({
+  name: 'connect.sid',
+  keys: [process.env.SESSION_SECRET || 'your-secret-key'],
+  maxAge: 24 * 60 * 60 * 1000,
+  secure: false,
+  httpOnly: true,
+  sameSite: 'lax',
+  path: '/'
+});
 
+// Function to check if the user is authenticated for admin action
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction): void => {
-    
-    if (req.session.isAdmin) {
-      next();
-    } else {
-      res.status(401).json({ error: 'Unauthorized' });
-    }
-  };
+  if (req.session?.isAdmin) {
+    next();
+  } else {
+    res.status(401).json({ error: 'Unauthorized' });
+  }
+};
 
+// This function will always create a new admin accout if one doesn't exixt when backend is first run
 export const initializeAdmin = async (): Promise<void> => {
   try {
     const adminExists = await prisma.admin.findFirst();
@@ -99,7 +98,10 @@ router.post(
         return;
       }
 
-      req.session.isAdmin = true;
+      req.session = {
+        isAdmin: true
+      };
+      
       res.json({ message: 'Logged in successfully' });
     } catch (error) {
       console.error('Login error:', error);
@@ -112,21 +114,8 @@ router.post(
 router.post(
   '/logout',
   (req: Request, res: Response<AuthResponse>): void => {
-    req.session.destroy((err) => {
-      if (err) {
-        res.status(500).json({ error: 'Could not log out' });
-        return;
-      }
-      res.json({ message: 'Logged out successfully' });
-    });
-  }
-);
-
-// Check auth status route
-router.get(
-  '/check-auth',
-  (req: Request, res: Response<{ isAuthenticated: boolean }>): void => {
-    res.json({ isAuthenticated: req.session.isAdmin === true });
+    req.session = null as any;
+    res.json({ message: 'Logged out successfully' });
   }
 );
 
@@ -144,14 +133,14 @@ router.post(
       const admin = await prisma.admin.findFirst();
 
       if (!admin) {
-        res.status(404).json({ error: 'Admin account not found' });
+        res.status(404).json({ error: 'Admin account not used' });
         return;
       }
 
       const validPassword = await bcrypt.compare(currentPassword, admin.password);
 
       if (!validPassword) {
-        res.status(401).json({ error: 'Current password is incorrect' });
+        res.status(401).json({ error: 'Zadané administrátorské heslo nie je správne.' });
         return;
       }
 
