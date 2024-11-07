@@ -28,25 +28,39 @@ declare module 'express' {
   }
 }
 
+// Validate required environment
+const requiredEnvVars = ['SESSION_SECRET', 'DEFAULT_ADMIN_PASSWORD', 'NODE_ENV'];
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    throw new Error(`Pro produkční prostředí musí být nastavena proměnná ${envVar}`);
+  }
+}
+
 const router = express.Router();
 
+// Session to hold cookies for admin role
 export const sessionMiddleware = cookieSession({
-  name: 'connect.sid',
-  keys: [process.env.SESSION_SECRET || 'your-secret-key'],
+  name: 'session',
+  keys: [process.env.SESSION_SECRET!],
   maxAge: 24 * 60 * 60 * 1000,
-  secure: false,
+  secure: false, // set as "process.env.NODE_ENV === 'production'" for production
   httpOnly: true,
-  sameSite: 'lax',
+  sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
   path: '/'
 });
 
 // Function to check if the user is authenticated for admin action
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction): void => {
-  if (req.session?.isAdmin) {
-    next();
-  } else {
-    res.status(401).json({ error: 'Unauthorized' });
+  if (!req.session) {
+    res.status(401).json({ error: 'Relace vypršela' });
+    return;
   }
+
+  if (!req.session.isAdmin) {
+    res.status(401).json({ error: 'Neoprávněný přístup' });
+    return;
+  }
+  next();
 };
 
 // This function will always create a new admin accout if one doesn't exixt when backend is first run
@@ -55,7 +69,12 @@ export const initializeAdmin = async (): Promise<void> => {
     const adminExists = await prisma.admin.findFirst();
     
     if (!adminExists) {
-      const defaultPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'admin123';
+      const defaultPassword = process.env.DEFAULT_ADMIN_PASSWORD;
+
+      if (!defaultPassword) {
+        throw new Error('DEFAULT_ADMIN_PASSWORD environment variable must be set in production');
+      }
+
       const hashedPassword = await bcrypt.hash(defaultPassword, 10);
       
       await prisma.admin.create({
@@ -87,14 +106,14 @@ router.post(
       });
 
       if (!admin) {
-        res.status(401).json({ error: 'Invalid credentials' });
+        res.status(401).json({ error: 'Neplatné přihlašovací údaje' });
         return;
       }
 
       const validPassword = await bcrypt.compare(password, admin.password);
 
       if (!validPassword) {
-        res.status(401).json({ error: 'Invalid credentials' });
+        res.status(401).json({ error: 'Neplatné přihlašovací údaje' });
         return;
       }
 
@@ -102,10 +121,10 @@ router.post(
         isAdmin: true
       };
       
-      res.json({ message: 'Logged in successfully' });
+      res.json({ message: 'Přihlášení bylo úspěšné' });
     } catch (error) {
       console.error('Login error:', error);
-      res.status(500).json({ error: 'An error occurred during login' });
+      res.status(500).json({ error: 'Při přihlašování došlo k chybě' });
     }
   }
 );
@@ -114,8 +133,9 @@ router.post(
 router.post(
   '/logout',
   (req: Request, res: Response<AuthResponse>): void => {
-    req.session = null as any;
-    res.json({ message: 'Logged out successfully' });
+    req.session = null;
+    res.clearCookie('session');
+    res.json({ message: 'Odhlášení bylo úspěšné' });
   }
 );
 
@@ -130,17 +150,24 @@ router.post(
     try {
       const { currentPassword, newPassword } = req.body;
 
+      if (!newPassword || newPassword.length < 12) {
+        res.status(400).json({ 
+          error: 'Nové heslo musí mít alespoň 12 znaků' 
+        });
+        return;
+      }
+
       const admin = await prisma.admin.findFirst();
 
       if (!admin) {
-        res.status(404).json({ error: 'Admin account not used' });
+        res.status(404).json({ error: 'Administrátorský účet nebyl nalezen' });
         return;
       }
 
       const validPassword = await bcrypt.compare(currentPassword, admin.password);
 
       if (!validPassword) {
-        res.status(401).json({ error: 'Zadané administrátorské heslo nie je správne.' });
+        res.status(401).json({ error: 'Zadané administrátorské heslo není správné' });
         return;
       }
 
@@ -154,10 +181,10 @@ router.post(
         }
       });
 
-      res.json({ message: 'Password updated successfully' });
+      res.json({ message: 'Heslo bylo úspěšně změněno' });
     } catch (error) {
       console.error('Change password error:', error);
-      res.status(500).json({ error: 'An error occurred while changing password' });
+      res.status(500).json({ error: 'Při změně hesla došlo k chybě' });
     }
   }
 );

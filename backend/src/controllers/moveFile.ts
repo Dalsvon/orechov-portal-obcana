@@ -1,42 +1,3 @@
-/*import { RequestHandler } from 'express';
-import { db } from '../database/serverConfig';
-
-const moveFile: RequestHandler = async (req, res, next) => {
-  try {
-    const { fileId, sourceFolder, targetFolder } = req.body;
-
-    if (!fileId || !sourceFolder || !targetFolder) {
-      res.status(400).json({ error: 'Missing required parameters' });
-      return;
-    }
-
-    // Get the file data from the source folder
-    const sourceRef = db.ref(`documents/${sourceFolder}/${fileId}`);
-    const fileSnapshot = await sourceRef.once('value');
-    
-    if (!fileSnapshot.exists()) {
-      res.status(404).json({ error: 'File not found' });
-      return;
-    }
-
-    const fileData = fileSnapshot.val();
-
-    // Add the file to the target folder
-    const targetRef = db.ref(`documents/${targetFolder}/${fileId}`);
-    await targetRef.set({
-      ...fileData,
-      folder: targetFolder
-    });
-
-    // Remove the file from the source folder
-    await sourceRef.remove();
-
-    res.status(200).json({ message: 'File moved successfully' });
-  } catch (error) {
-    next(error);
-  }
-};*/
-
 import { RequestHandler } from 'express';
 import prisma from '../database/prisma';
 
@@ -44,22 +5,48 @@ const moveFile: RequestHandler = async (req, res, next) => {
   try {
     const { fileId, sourceFolder, targetFolder } = req.body;
 
-    // Find source folder
+    if (!fileId || !sourceFolder || !targetFolder) {
+      res.status(400).json({ 
+        error: 'Chybí potřebné údaje pro přesun souboru' 
+      });
+      return;
+    }
+
+    if (sourceFolder === targetFolder) {
+      res.status(400).json({ 
+        error: 'Soubor je již v této složce' 
+      });
+      return;
+    }
+
     const sourcefolderRecord = await prisma.folder.findUnique({
-      where: { name: sourceFolder }
+      where: { 
+        name: sourceFolder
+      },
+      include: {
+        files: {
+          where: { id: fileId },
+          select: { id: true }
+        }
+      }
     });
 
-    // Find target folder
     const targetFolderRecord = await prisma.folder.findUnique({
       where: { name: targetFolder }
     });
 
     if (!sourcefolderRecord || !targetFolderRecord) {
-      res.status(404).json({ error: 'Source or target folder not found' });
+      res.status(404).json({ error: 'Zdrojová nebo cílová složka neexistuje' });
       return;
     }
 
-    // Update file's folder
+    if (sourcefolderRecord.files.length === 0) {
+      res.status(404).json({ 
+        error: 'Soubor nebyl nalezen ve zdrojové složce' 
+      });
+      return;
+    }
+
     await prisma.file.update({
       where: { id: fileId },
       data: { folderId: targetFolderRecord.id }
@@ -67,7 +54,10 @@ const moveFile: RequestHandler = async (req, res, next) => {
 
     res.status(200).json({ message: 'File moved successfully' });
   } catch (error) {
-    next(error);
+    console.error('Error during file move:', error);
+    res.status(500).json({ 
+      error: 'Při přesunu souboru došlo k chybě. Zkuste to prosím později.' 
+    });
   }
 };
 

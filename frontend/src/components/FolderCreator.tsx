@@ -8,15 +8,10 @@ interface FolderCreatorProps {
   onFolderCreated: () => void;
 }
 
-interface Toast {
-  message: string;
-  type: 'success' | 'error';
-}
-
 const FolderCreator: React.FC<FolderCreatorProps> = ({ onFolderCreated }) => {
   const [newFolderName, setNewFolderName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
-  const [toast, setToast] = useState<Toast | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const isAdmin = useRecoilValue(isAdminState);
 
   const showToast = (message: string, type: 'success' | 'error') => {
@@ -36,9 +31,10 @@ const FolderCreator: React.FC<FolderCreatorProps> = ({ onFolderCreated }) => {
       setNewFolderName('');
       onFolderCreated();
       showToast('Složka byla úspěšně vytvořena', 'success');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding folder:', error);
-      showToast('Nepodařilo se vytvořit složku. Prosím zkuste to znovu.', 'error');
+      const errorMessage = error.response?.data?.error || 'Nastala neočekávaná chyba';
+      showToast(errorMessage, 'error');
     } finally {
       setIsCreating(false);
     }

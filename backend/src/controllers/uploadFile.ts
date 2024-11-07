@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import prisma from '../database/prisma';
 import path from 'path';
 
-// Function to format date
+
 const formatDate = (date: Date): string => {
   return date.toLocaleString('en-US', {
     year: 'numeric',
@@ -15,7 +15,6 @@ const formatDate = (date: Date): string => {
   });
 };
 
-// Function to get file type
 const getShortFileType = (mimeType: string, originalFilename: string): string => {
   const mimeTypeMap: { [key: string]: string } = {
     'application/pdf': 'pdf',
@@ -43,31 +42,43 @@ const getShortFileType = (mimeType: string, originalFilename: string): string =>
 };
 
 const uploadFile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  if (!req.file) {
-    res.status(400).json({ error: 'No file uploaded' });
-    return;
-  }
-
-  const { originalname, buffer, mimetype, size } = req.file;
-  const { name, description, folder } = req.body;
-
-  if (!folder) {
-    res.status(400).json({ error: 'Folder not specified' });
-    return;
-  }
-
   try {
-    // Find or create the folder
+    if (!req.file) {
+      res.status(400).json({ error: 'Nebyl vybrán žádný soubor' });
+      return;
+    }
+
+    const { originalname, buffer, mimetype, size } = req.file;
+    const { name, description, folder } = req.body;
+
+    if (!name || !folder) {
+      res.status(400).json({ error: 'Název a složka jsou povinné' });
+      return;
+    }
+
     const existingFolder = await prisma.folder.findUnique({
       where: { name: folder }
     });
 
     if (!existingFolder) {
-      res.status(404).json({ error: 'Folder not found' });
+      res.status(404).json({ error: 'Vybraná složka neexistuje' });
       return;
     }
 
-    // Create file record with binary content
+    const existingFile = await prisma.file.findFirst({
+      where: {
+        name,
+        folderId: existingFolder.id
+      }
+    });
+
+    if (existingFile) {
+      res.status(409).json({ 
+        error: 'Soubor s tímto názvem již ve složce existuje' 
+      });
+      return;
+    }
+
     const newFile = await prisma.file.create({
       data: {
         name,
@@ -82,7 +93,7 @@ const uploadFile = async (req: Request, res: Response, next: NextFunction): Prom
     });
 
     res.status(200).json({
-      message: 'File uploaded successfully',
+      message: 'Soubor byl úspěšně nahrán',
       id: newFile.id,
       name: newFile.name,
       description: newFile.description,
@@ -93,7 +104,7 @@ const uploadFile = async (req: Request, res: Response, next: NextFunction): Prom
     });
   } catch (error) {
     console.error('Error uploading file:', error);
-    res.status(500).json({ error: 'Failed to upload file' });
+    res.status(500).json({ error: 'Při nahrávání souboru došlo k chybě. Zkuste to prosím později' });
   }
 };
 

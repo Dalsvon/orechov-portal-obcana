@@ -13,7 +13,7 @@ const Folder: React.FC<FolderProps> = ({
   onDeleteFolder
 }) => {
   const handleDelete = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent navigation when clicking delete
+    e.preventDefault();
     onDeleteFolder(name);
   };
 

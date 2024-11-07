@@ -21,6 +21,33 @@ interface Toast {
   type: 'success' | 'error';
 }
 
+const FileDescription: React.FC<{ description: string | null }> = ({ description }) => {
+  if (!description) return null;
+
+  // Split into paragraphs and filter out empty ones
+  const paragraphs = description.split(/\n\s*\n/).filter(p => p.trim());
+  
+  if (paragraphs.length <= 1) {
+    // For single paragraphs, just preserve line breaks
+    return (
+      <p className="text-gray-600 mb-2 whitespace-pre-line">
+        {description}
+      </p>
+    );
+  }
+
+  // For multiple paragraphs, create proper spacing
+  return (
+    <div className="text-gray-600 mb-2 space-y-4">
+      {paragraphs.map((paragraph, index) => (
+        <p key={index} className="whitespace-pre-line">
+          {paragraph}
+        </p>
+      ))}
+    </div>
+  );
+};
+
 const FolderContent: React.FC = () => {
   const { folderName } = useParams<{ folderName: string }>();
   const navigate = useNavigate();
@@ -184,9 +211,7 @@ const FolderContent: React.FC = () => {
                   <h3 className="text-lg font-semibold mb-2">
                     {file.name}
                   </h3>
-                  <p className="text-gray-600 mb-2">
-                    {file.description}
-                  </p>
+                  <FileDescription description={file.description} />
                   <div className="flex gap-4 text-sm text-gray-500">
                     <span>Velikost: {formatFileSize(file.fileSize)}</span>
                     <span>Typ: {file.fileType.toUpperCase()}</span>

@@ -27,8 +27,8 @@ model File {
   id          String   @id @default(uuid())
   name        String
   description String?
-  content     Bytes    // Store file content as binary
-  mimeType    String   // Store the file's MIME type
+  content     Bytes
+  mimeType    String
   uploadDate  DateTime @default(now())
   fileType    String
   fileSize    Int

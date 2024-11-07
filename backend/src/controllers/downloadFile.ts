@@ -1,40 +1,18 @@
-/*import { RequestHandler } from 'express';
-import { bucket, db } from '../database/serverConfig';
-
-const downloadFile: RequestHandler = async (req, res, next): Promise<void> => {
-  try {
-    const { folder, id } = req.params;
-
-    const snapshot = await db.ref(`documents/${folder}/${id}`).once('value');
-    const fileData = snapshot.val();
-
-    if (!fileData || !fileData.url) {
-      res.status(404).json({ error: 'File not found' });
-      return;
-    }
-
-    const [signedUrl] = await bucket.file(fileData.url).getSignedUrl({
-      action: 'read',
-      expires: Date.now() + 15 * 60 * 1000, // URL expires in 15 minutes
-    });
-
-    res.json({ downloadUrl: signedUrl });
-  } catch (error) {
-    console.error('Error generating download URL:', error);
-    res.status(500).json({ error: 'Failed to generate download URL' });
-  }
-};
-
-*/
-
 import { RequestHandler } from 'express';
 import prisma from '../database/prisma';
 
+// Sends client a file in a form of Buffer
 const downloadFile: RequestHandler = async (req, res, next) => {
   try {
     const { folder, id } = req.params;
 
-    // Find the file with folder verification
+    if (!folder || !id) {
+      res.status(400).json({ 
+        error: 'Chybí identifikátor složky nebo souboru' 
+      });
+      return;
+    }
+
     const file = await prisma.file.findFirst({
       where: {
         id,
@@ -45,22 +23,28 @@ const downloadFile: RequestHandler = async (req, res, next) => {
     });
 
     if (!file) {
-      res.status(404).json({ error: 'File not found' });
+      res.status(404).json({ 
+        error: 'Soubor nebyl nalezen' 
+      });
       return;
     }
 
-    // Convert Buffer to Uint8Array if necessary
-    const fileBuffer = file.content instanceof Buffer 
-      ? file.content 
-      : Buffer.from(file.content);
+    const sanitizedFileName = encodeURIComponent(file.name)
+      .replace(/['()]/g, escape)
+      .replace(/\*/g, '_');
 
-    // Set response headers
+    if (!file.content || !(file.content instanceof Buffer)) {
+      res.status(500).json({ 
+        error: 'Obsah souboru je poškozený nebo chybí' 
+      });
+      return;
+    }
+
     res.setHeader('Content-Type', file.mimeType);
-    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(file.name)}"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(sanitizedFileName)}"`);
     res.setHeader('Content-Length', file.fileSize);
 
-    // Send the file directly as a buffer
-    res.send(fileBuffer);
+    res.send(file.content);
   } catch (error) {
     console.error('Error downloading file:', error);
     next(error);
