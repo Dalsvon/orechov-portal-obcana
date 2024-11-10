@@ -11,6 +11,13 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./ssl:/var/lib/postgresql/ssl
+    command: >
+      -c ssl=on
+      -c ssl_cert_file=/var/lib/postgresql/ssl/server.crt
+      -c ssl_key_file=/var/lib/postgresql/ssl/server.key
+      -c ssl_ca_file=/var/lib/postgresql/ssl/ca.crt
+      -c hba_file=/var/lib/postgresql/ssl/pg_hba.conf
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]

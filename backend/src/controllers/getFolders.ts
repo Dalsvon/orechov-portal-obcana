@@ -16,7 +16,7 @@ const getFolders: RequestHandler = async (req, res, next) => {
         id: file.id,
         name: file.name,
         description: file.description,
-        uploadDate: file.uploadDate.toLocaleString(),
+        uploadDate: file.uploadDate.toISOString(),
         fileType: file.fileType,
         fileSize: file.fileSize,
         folder: folder.name

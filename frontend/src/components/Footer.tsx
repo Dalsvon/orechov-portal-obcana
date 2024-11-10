@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, Mail, MapPin, Clock } from 'lucide-react';
+import { Phone, Mail, MapPin } from 'lucide-react';
 import axiosInstance from '../services/axiosInstance';
 
 interface OfficeHours {

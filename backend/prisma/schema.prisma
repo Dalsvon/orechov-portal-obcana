@@ -40,41 +40,44 @@ model File {
 }
 
 model Contact {
-  id          Int        @id @default(autoincrement())
-  createdAt   DateTime   @default(now())
-  name        String
-  address     String?
-  phone       String?
-  mobile      String?
-  email       String?
-  maintenence String?
-  dataId      String?    @map("data_id")
-  ic          String?
-  dic         String?
-  bankAccount String?    @map("bank_account")
+  createdAt    DateTime @default(now())
+  name         String
+  address      String?
+  phone        String?
+  mobile       String?
+  email        String?
+  maintenence  String?
+  data_id      String?
+  ic           String?
+  dic          String?
+  bank_account String?
+  last_updated DateTime @updatedAt
   officeHours OfficeHours[]
-  lastUpdated DateTime   @updatedAt @map("last_updated")
   employees   Employee[]
 
+  // Make this a singleton
+  @@unique([createdAt], name: "singleton")
   @@map("contact")
 }
 
 model OfficeHours {
-  id          Int             @id @default(autoincrement())
-  days        String
-  time        String
-  contact     Contact         @relation(fields: [contactId], references: [id])
-  contactId   Int             @map("contactId")
+  id        Int      @id @default(autoincrement())
+  days      String
+  time      String
+  contact   Contact  @relation(fields: [contactId], references: [createdAt], onDelete: Cascade)
+  contactId DateTime
+
+  @@map("office_hours")
 }
 
 model Employee {
-  id             Int          @id @default(autoincrement())
-  name           String
-  position       String?
-  phone          String?
-  email          String?
-  contact         Contact     @relation(fields: [contactId], references: [id])
-  contactId      Int          @map("contactId")
+  id        Int      @id @default(autoincrement())
+  name      String
+  position  String?
+  phone     String?
+  email     String?
+  contact   Contact  @relation(fields: [contactId], references: [createdAt], onDelete: Cascade)
+  contactId DateTime
 
   @@map("employees")
 }

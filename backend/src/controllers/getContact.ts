@@ -5,7 +5,6 @@ import prisma from '../database/prisma';
 const getContact: RequestHandler = async (req, res, next): Promise<void> => {
   try {
     const contact = await prisma.contact.findFirst({
-      where: { id: 1 },
       include: {
         officeHours: {
           select: {
@@ -34,18 +33,17 @@ const getContact: RequestHandler = async (req, res, next): Promise<void> => {
     }
 
     const formattedContact = {
-      id: contact.id,
       name: contact.name,
       address: contact.address,
       phone: contact.phone,
       mobile: contact.mobile,
       email: contact.email,
       maintenence: contact.maintenence,
-      dataId: contact.dataId,
+      dataId: contact.data_id,
       ic: contact.ic,
       dic: contact.dic,
-      bankAccount: contact.bankAccount,
-      lastUpdated: contact.lastUpdated.toISOString(),
+      bankAccount: contact.bank_account,
+      lastUpdated: contact.last_updated.toISOString(),
       officeHours: contact.officeHours,
       employees: contact.employees
     };
