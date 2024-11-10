@@ -214,7 +214,7 @@ const FolderContent: React.FC = () => {
                   <FileDescription description={file.description} />
                   <div className="flex gap-4 text-sm text-gray-500">
                     <span>Velikost: {formatFileSize(file.fileSize)}</span>
-                    <span>Typ: {file.fileType.toUpperCase()}</span>
+                    <span>Formát: {file.fileType.toUpperCase()}</span>
                   </div>
                 </div>
                 

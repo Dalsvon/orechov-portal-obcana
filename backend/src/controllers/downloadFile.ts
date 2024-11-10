@@ -1,8 +1,13 @@
 import { RequestHandler } from 'express';
+import { FileRepository } from '../repositories/file';
 import prisma from '../database/prisma';
+import { sanitizeFileName } from '../utils/fileutils';
+import { DownloadFileRequest } from '../types/file.types'
+
+const fileRepository = new FileRepository(prisma);
 
 // Sends client a file in a form of Buffer
-const downloadFile: RequestHandler = async (req, res, next) => {
+const downloadFile: RequestHandler<DownloadFileRequest> = async (req, res, next) => {
   try {
     const { folder, id } = req.params;
 
@@ -13,14 +18,7 @@ const downloadFile: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const file = await prisma.file.findFirst({
-      where: {
-        id,
-        folder: {
-          name: folder
-        }
-      }
-    });
+    const file = await fileRepository.findByIdInFolder(id, folder);
 
     if (!file) {
       res.status(404).json({ 
@@ -29,10 +27,6 @@ const downloadFile: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const sanitizedFileName = encodeURIComponent(file.name)
-      .replace(/['()]/g, escape)
-      .replace(/\*/g, '_');
-
     if (!file.content || !(file.content instanceof Buffer)) {
       res.status(500).json({ 
         error: 'Obsah souboru je poškozený nebo chybí' 
@@ -40,8 +34,10 @@ const downloadFile: RequestHandler = async (req, res, next) => {
       return;
     }
 
+    const sanitizedFileName = sanitizeFileName(file.name);
+
     res.setHeader('Content-Type', file.mimeType);
-    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(sanitizedFileName)}"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${sanitizedFileName}"`);
     res.setHeader('Content-Length', file.fileSize);
 
     res.send(file.content);

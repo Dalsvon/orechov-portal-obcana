@@ -1,9 +1,15 @@
 import { RequestHandler } from 'express';
+import { FileRepository } from '../repositories/file';
+import { FolderRepository } from '../repositories/folder';
 import prisma from '../database/prisma';
+import { MoveFileParams } from '../types/file.types';
 
-const moveFile: RequestHandler = async (req, res, next) => {
+const fileRepository = new FileRepository(prisma);
+const folderRepository = new FolderRepository(prisma);
+
+const moveFile: RequestHandler = async (req, res) => {
   try {
-    const { fileId, sourceFolder, targetFolder } = req.body;
+    const { fileId, sourceFolder, targetFolder }: MoveFileParams = req.body;
 
     if (!fileId || !sourceFolder || !targetFolder) {
       res.status(400).json({ 
@@ -19,38 +25,25 @@ const moveFile: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const sourcefolderRecord = await prisma.folder.findUnique({
-      where: { 
-        name: sourceFolder
-      },
-      include: {
-        files: {
-          where: { id: fileId },
-          select: { id: true }
-        }
-      }
-    });
-
-    const targetFolderRecord = await prisma.folder.findUnique({
-      where: { name: targetFolder }
-    });
+    const sourcefolderRecord = await folderRepository.findByNameWithFileIds(sourceFolder);
+    const targetFolderRecord = await folderRepository.findByNameWithFileIds(targetFolder);
 
     if (!sourcefolderRecord || !targetFolderRecord) {
-      res.status(404).json({ error: 'Zdrojová nebo cílová složka neexistuje' });
+      res.status(404).json({ 
+        error: 'Zdrojová nebo cílová složka neexistuje' 
+      });
       return;
     }
 
-    if (sourcefolderRecord.files.length === 0) {
+    const fileExists = sourcefolderRecord.files.some(file => file.id === fileId);
+    if (!fileExists) {
       res.status(404).json({ 
         error: 'Soubor nebyl nalezen ve zdrojové složce' 
       });
       return;
     }
 
-    await prisma.file.update({
-      where: { id: fileId },
-      data: { folderId: targetFolderRecord.id }
-    });
+    await fileRepository.updateFolder(fileId, targetFolderRecord.id);
 
     res.status(200).json({ message: 'File moved successfully' });
   } catch (error) {

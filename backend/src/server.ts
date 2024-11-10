@@ -9,12 +9,14 @@ import addFolder from './controllers/addFolder';
 import deleteFolder from './controllers/deleteFolder';
 import moveFile from './controllers/moveFile';
 import getContact from './controllers/getContact';
-import authRouter, { sessionMiddleware, initializeAdmin, isAuthenticated } from './auth/auth';
+import authRouter, { sessionMiddleware, isAuthenticated } from './auth/auth';
+import { initializeSystem } from './services/initializer';
 
 const app = express();
 
 app.use(cors({
   origin: 'http://localhost:3000',
+  //origin: 'http://192.168.1.179:3000',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
@@ -59,7 +61,7 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 3001;
 
 
-initializeAdmin().then(() => {
+initializeSystem().then(() => {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });

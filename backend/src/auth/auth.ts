@@ -1,23 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import express from 'express';
 import cookieSession from 'cookie-session';
-import bcrypt from 'bcrypt';
+import { AdminRepository } from '../repositories/admin';
 import prisma from '../database/prisma';
-
-interface LoginRequest {
-  username: string;
-  password: string;
-}
-
-interface ChangePasswordRequest {
-  currentPassword: string;
-  newPassword: string;
-}
-
-interface AuthResponse {
-  message?: string;
-  error?: string;
-}
+import { LoginRequest, ChangePasswordRequest, AuthResponse } from '../types/auth.types';
 
 declare module 'express' {
   interface Request {
@@ -36,6 +22,7 @@ for (const envVar of requiredEnvVars) {
   }
 }
 
+const adminRepository = new AdminRepository(prisma);
 const router = express.Router();
 
 // Session to hold cookies for admin role
@@ -66,28 +53,21 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
 // This function will always create a new admin accout if one doesn't exixt when backend is first run
 export const initializeAdmin = async (): Promise<void> => {
   try {
-    const adminExists = await prisma.admin.findFirst();
+    const adminExists = await adminRepository.findFirst();
     
     if (!adminExists) {
       const defaultPassword = process.env.DEFAULT_ADMIN_PASSWORD;
 
       if (!defaultPassword) {
-        throw new Error('DEFAULT_ADMIN_PASSWORD environment variable must be set in production');
+        throw new Error('DEFAULT_ADMIN_PASSWORD environment variable must be set');
       }
 
-      const hashedPassword = await bcrypt.hash(defaultPassword, 10);
-      
-      await prisma.admin.create({
-        data: {
-          username: 'admin',
-          password: hashedPassword
-        }
-      });
-      
+      await adminRepository.create('admin', defaultPassword);
       console.log('Admin account initialized');
     }
   } catch (error) {
     console.error('Error initializing admin account:', error);
+    throw error;
   }
 };
 
@@ -101,16 +81,14 @@ router.post(
     try {
       const { username, password } = req.body;
 
-      const admin = await prisma.admin.findUnique({
-        where: { username }
-      });
+      const admin = await adminRepository.findByUsername(username);
 
       if (!admin) {
         res.status(401).json({ error: 'Neplatné přihlašovací údaje' });
         return;
       }
 
-      const validPassword = await bcrypt.compare(password, admin.password);
+      const validPassword = await adminRepository.verifyPassword(admin.password, password);
 
       if (!validPassword) {
         res.status(401).json({ error: 'Neplatné přihlašovací údaje' });
@@ -157,29 +135,24 @@ router.post(
         return;
       }
 
-      const admin = await prisma.admin.findFirst();
+      const admin = await adminRepository.findFirst();
 
       if (!admin) {
         res.status(404).json({ error: 'Administrátorský účet nebyl nalezen' });
         return;
       }
 
-      const validPassword = await bcrypt.compare(currentPassword, admin.password);
+      const validPassword = await adminRepository.verifyPassword(
+        admin.password,
+        currentPassword
+      );
 
       if (!validPassword) {
         res.status(401).json({ error: 'Zadané administrátorské heslo není správné' });
         return;
       }
 
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-      await prisma.admin.update({
-        where: { id: admin.id },
-        data: { 
-          password: hashedPassword,
-          updatedAt: new Date()
-        }
-      });
+      await adminRepository.updatePassword(admin.id, newPassword);
 
       res.json({ message: 'Heslo bylo úspěšně změněno' });
     } catch (error) {

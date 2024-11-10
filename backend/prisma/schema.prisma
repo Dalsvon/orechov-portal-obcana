@@ -39,6 +39,7 @@ model File {
   @@index([folderId])
 }
 
+// Singleton contact
 model Contact {
   createdAt    DateTime @default(now())
   name         String
@@ -55,7 +56,6 @@ model Contact {
   officeHours OfficeHours[]
   employees   Employee[]
 
-  // Make this a singleton
   @@unique([createdAt], name: "singleton")
   @@map("contact")
 }

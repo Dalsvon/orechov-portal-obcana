@@ -14,6 +14,7 @@ const AdminLogin: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setUsername('admin')
     setError(null);
     setIsSubmitting(true);
 

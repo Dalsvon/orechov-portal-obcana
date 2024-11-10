@@ -1,16 +1,16 @@
 import { RequestHandler } from 'express';
+import { FolderRepository } from '../repositories/folder';
 import prisma from '../database/prisma';
+import { FormattedFolder } from '../types/folder.types';
 
-// Returns folders and their associated files
-const getFolders: RequestHandler = async (req, res, next) => {
+const folderRepository = new FolderRepository(prisma);
+
+// Returns all existing folders and their files
+const getFolders: RequestHandler = async (req, res) => {
   try {
-    const folders = await prisma.folder.findMany({
-      include: {
-        files: true,
-      },
-    });
+    const folders = await folderRepository.findAll();
     
-    const formattedFolders = folders.map(folder => ({
+    const formattedFolders: FormattedFolder[] = folders.map(folder => ({
       name: folder.name,
       files: folder.files.map(file => ({
         id: file.id,
