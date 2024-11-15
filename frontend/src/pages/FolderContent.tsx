@@ -6,6 +6,7 @@ import axiosInstance from '../services/axiosInstance';
 import Movefile from '../components/Movefile';
 import FileUploader from '../components/FileUploader';
 import Toast from '../notifications/Toast';
+import { Plus, X } from 'lucide-react';
 
 interface PDF {
   id: string;
@@ -21,33 +22,6 @@ interface Toast {
   type: 'success' | 'error';
 }
 
-const FileDescription: React.FC<{ description: string | null }> = ({ description }) => {
-  if (!description) return null;
-
-  // Split into paragraphs and filter out empty ones
-  const paragraphs = description.split(/\n\s*\n/).filter(p => p.trim());
-  
-  if (paragraphs.length <= 1) {
-    // For single paragraphs, just preserve line breaks
-    return (
-      <p className="text-gray-600 mb-2 whitespace-pre-line">
-        {description}
-      </p>
-    );
-  }
-
-  // For multiple paragraphs, create proper spacing
-  return (
-    <div className="text-gray-600 mb-2 space-y-4">
-      {paragraphs.map((paragraph, index) => (
-        <p key={index} className="whitespace-pre-line">
-          {paragraph}
-        </p>
-      ))}
-    </div>
-  );
-};
-
 const FolderContent: React.FC = () => {
   const { folderName } = useParams<{ folderName: string }>();
   const navigate = useNavigate();
@@ -57,6 +31,7 @@ const FolderContent: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<{id: string, name: string} | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
+  const [showUploader, setShowUploader] = useState(false);
 
   const fetchFolderContent = async () => {
     if (!folderName) return;
@@ -100,7 +75,7 @@ const FolderContent: React.FC = () => {
 
   const handleDownload = async (id: string) => {
     try {
-      const response = await axiosInstance.get(`/api/pdfs/${folderName}/${id}/download`, {
+      const response = await axiosInstance.get(`/api/file/${folderName}/${id}/download`, {
         responseType: 'blob'
       });
   
@@ -128,7 +103,7 @@ const FolderContent: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm('Opravdu chcete tento soubor smazat?')) {
       try {
-        await axiosInstance.delete(`/api/pdfs/${folderName}/${id}`);
+        await axiosInstance.delete(`/api/file/${folderName}/${id}`);
         await fetchFolderContent();
         showToast('Soubor byl úspěšně smazán', 'success');
       } catch (error) {
@@ -138,12 +113,26 @@ const FolderContent: React.FC = () => {
     }
   };
 
+  const handleUploadComplete = () => {
+    fetchFolderContent();
+    setShowUploader(false);
+  };
+
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 B';
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const formatDescription = (description: string) => {
+    return description.split('\n').map((line, index) => (
+      <React.Fragment key={index}>
+        {line}
+        {index < description.split('\n').length - 1 && <br />}
+      </React.Fragment>
+    ));
   };
 
   if (isLoading) {
@@ -182,19 +171,9 @@ const FolderContent: React.FC = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow">
-        <h2 className="text-2xl font-bold p-6 border-b">
+        <h2 className="text-2xl font-bold p-6 border-b break-words">
           {decodeURIComponent(folderName || '')}
         </h2>
-
-        {isAdmin && (
-          <div className="p-6 border-b">
-            <FileUploader 
-              defaultFolder={folderName}
-              hideFolder={true}
-              onUploadComplete={fetchFolderContent}
-            />
-          </div>
-        )}
 
         {files.length === 0 ? (
           <div className="text-center p-10 text-gray-500">
@@ -208,17 +187,21 @@ const FolderContent: React.FC = () => {
                 className="p-6 hover:bg-gray-50 transition-colors"
               >
                 <div className="mb-4">
-                  <h3 className="text-lg font-semibold mb-2">
+                  <h3 className="text-lg font-semibold mb-2 break-words">
                     {file.name}
                   </h3>
-                  <FileDescription description={file.description} />
+                  {file.description && (
+                    <p className="text-gray-600 mb-2 whitespace-pre-line break-words">
+                      {formatDescription(file.description)}
+                    </p>
+                  )}
                   <div className="flex gap-4 text-sm text-gray-500">
                     <span>Velikost: {formatFileSize(file.fileSize)}</span>
-                    <span>Formát: {file.fileType.toUpperCase()}</span>
+                    <span>Typ: {file.fileType.toUpperCase()}</span>
                   </div>
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => handleDownload(file.id)}
                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
@@ -245,6 +228,39 @@ const FolderContent: React.FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {isAdmin && !showUploader && (
+          <div className="p-6 border-t flex justify-center">
+            <button
+              onClick={() => setShowUploader(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            >
+              <Plus size={20} />
+              Přidat soubor
+            </button>
+          </div>
+        )}
+
+        {isAdmin && showUploader && (
+          <div className="p-6 border-t">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Přidat nový soubor</h3>
+              <button
+                onClick={() => setShowUploader(false)}
+                className="flex items-center gap-2 px-3 py-1 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+                title="Zrušit přidávání"
+              >
+                <X size={20} />
+                Zrušit
+              </button>
+            </div>
+            <FileUploader 
+              defaultFolder={folderName}
+              hideFolder={true}
+              onUploadComplete={handleUploadComplete}
+            />
           </div>
         )}
       </div>

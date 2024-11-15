@@ -47,7 +47,9 @@ const Folders: React.FC = () => {
     fetchFolders();
   }, []);
 
-  const handleDeleteFolder = async (folderName: string) => {
+  const handleDeleteFolder = async (folderName: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     try {
       await axiosInstance.delete(`/api/folders/${folderName}`);
       showToast('Složka byla úspěšně smazána', 'success');
@@ -101,71 +103,67 @@ const Folders: React.FC = () => {
           <div
             key={folder.name}
             className="group relative bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden"
+            onClick={() => handleFolderClick(folder.name)}
+            role="button"
+            tabIndex={0}
           >
-            <button
-              onClick={() => handleFolderClick(folder.name)}
-              className="w-full"
-            >
-              {/* Mobile layout (< 768px) */}
-              <div className="block md:hidden p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      {folder.name}
-                    </h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {folder.files.length} {folder.files.length === 1 ? 'soubor' : 
-                       folder.files.length >= 2 && folder.files.length <= 4 ? 'soubory' : 
-                       'souborů'}
-                    </p>
-                  </div>
-                  {isAdmin && folder.files.length === 0 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteFolder(folder.name);
-                      }}
-                      className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 
-                               rounded-full transition-colors duration-300"
-                      title="Smazat prázdnou složku"
-                    >
-                      <X size={20} />
-                    </button>
-                  )}
+            {/* Mobile layout (< 768px) */}
+            <div className="block md:hidden p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0 pr-2">
+                  <h3 className="text-lg font-semibold text-gray-800 break-words">
+                    {folder.name}
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {folder.files.length} {folder.files.length === 1 ? 'soubor' : 
+                     folder.files.length >= 2 && folder.files.length <= 4 ? 'soubory' : 
+                     'souborů'}
+                  </p>
                 </div>
+                {isAdmin && folder.files.length === 0 && (
+                  <div 
+                    onClick={(e) => handleDeleteFolder(folder.name, e)}
+                    className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 
+                             rounded-full transition-colors duration-300 flex-shrink-0 cursor-pointer"
+                    title="Smazat prázdnou složku"
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <X size={20} />
+                  </div>
+                )}
               </div>
+            </div>
 
-              {/* Desktop layout (≥ 768px) */}
-              <div className="hidden md:block aspect-square">
-                <div className="w-full h-full flex flex-col items-center justify-center p-6">
-                  <div className="text-center w-full">
-                    <h3 className="text-xl font-semibold text-gray-800 break-words">
-                      {folder.name}
-                    </h3>
-                    <p className="mt-2 text-gray-500 text-sm">
-                      {folder.files.length} {folder.files.length === 1 ? 'soubor' : 
-                      folder.files.length >= 2 && folder.files.length <= 4 ? 'soubory' : 
-                      'souborů'}
-                    </p>
-                  </div>
+            {/* Desktop layout (≥ 768px) */}
+            <div className="hidden md:block aspect-square">
+              <div className="w-full h-full flex flex-col items-center justify-center p-6">
+                <div className="text-center w-full">
+                  <h3 className="text-xl font-semibold text-gray-800 break-words">
+                    {folder.name}
+                  </h3>
+                  <p className="mt-2 text-gray-500 text-sm">
+                    {folder.files.length} {folder.files.length === 1 ? 'soubor' : 
+                    folder.files.length >= 2 && folder.files.length <= 4 ? 'soubory' : 
+                    'souborů'}
+                  </p>
                 </div>
               </div>
-            </button>
+            </div>
 
             {/* Desktop delete button */}
             {isAdmin && folder.files.length === 0 && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteFolder(folder.name);
-                }}
+              <div
+                onClick={(e) => handleDeleteFolder(folder.name, e)}
                 className="hidden md:block absolute top-2 right-2 text-red-500 
                          hover:text-red-700 p-2 rounded-full hover:bg-red-50 
-                         transition-colors duration-300"
+                         transition-colors duration-300 cursor-pointer"
                 title="Smazat prázdnou složku"
+                role="button"
+                tabIndex={0}
               >
                 <X size={20} />
-              </button>
+              </div>
             )}
           </div>
         ))}

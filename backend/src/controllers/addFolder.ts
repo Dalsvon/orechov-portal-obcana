@@ -39,7 +39,7 @@ const addFolder: RequestHandler = async (req, res) => {
     const folder = await folderRepository.create(sanitizedFolderName);
 
     res.status(201).json({ 
-      message: 'Složka byla vytvořena.', 
+      message: 'Složka byla vytvořena', 
       folderName: folder.name 
     });
   } catch (error) {

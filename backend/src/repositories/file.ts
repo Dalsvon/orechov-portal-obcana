@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { File, CreateFileDTO } from '../types/file.types';
+import { File, CreateFileRep } from '../types/file.types';
 
 // Handles file repository access
 export class FileRepository {
@@ -14,7 +14,7 @@ export class FileRepository {
     });
   }
 
-  async create(fileData: CreateFileDTO): Promise<File> {
+  async create(fileData: CreateFileRep): Promise<File> {
     return this.prisma.file.create({
       data: fileData
     });

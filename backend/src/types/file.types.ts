@@ -11,7 +11,7 @@ export interface File {
     folderId: string;
   }
   
-  export interface CreateFileDTO {
+  export interface CreateFileRep {
     name: string;
     description: string | null;
     content: Buffer;
@@ -20,16 +20,6 @@ export interface File {
     fileSize: number;
     fromWebsite: boolean;
     folderId: string;
-  }
-  
-  export interface UploadedFileResponse {
-    id: string;
-    name: string;
-    description: string | null;
-    uploadDate: string;
-    fileType: string;
-    fileSize: number;
-    folder: string;
   }
 
   export interface MoveFileParams {

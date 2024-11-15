@@ -20,3 +20,9 @@
     message?: string;
     error?: string;
   }
+
+  export interface AuthResponseCheck {
+    message?: string;
+    error?: string;
+    isAuthenticated?: boolean;
+  }

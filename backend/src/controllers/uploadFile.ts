@@ -1,18 +1,14 @@
-import { Request, Response, NextFunction } from 'express';
 import { FileRepository } from '../repositories/file';
 import { FolderRepository } from '../repositories/folder';
 import prisma from '../database/prisma';
 import { getShortFileType, formatDate } from '../utils/fileutils';
-import { UploadedFileResponse } from '../types/file.types';
+import { RequestHandler } from 'express';
 
 const fileRepository = new FileRepository(prisma);
 const folderRepository = new FolderRepository(prisma);
+const FILE_NAME_MAX_LENGTH = 100;
 
-const uploadFile = async (
-  req: Request, 
-  res: Response<{ message: string; error?: string } | UploadedFileResponse>, 
-  next: NextFunction
-): Promise<void> => {
+const uploadFile: RequestHandler = async (req, res): Promise<void> => {
   try {
     if (!req.file) {
       res.status(400).json({ message: 'Nebyl vybrán žádný soubor.' });
@@ -26,6 +22,14 @@ const uploadFile = async (
       res.status(400).json({ message: 'Název a složka jsou povinné.' });
       return;
     }
+
+    if (name.length > FILE_NAME_MAX_LENGTH) {
+      res.status(400).json({ 
+        message: `Název složky nemůže být delší než ${FILE_NAME_MAX_LENGTH} znaků.` 
+      });
+      return;
+    }
+
 
     const existingFolder = await folderRepository.findByName(folder);
 

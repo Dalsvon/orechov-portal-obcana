@@ -47,12 +47,12 @@ app.use('/api/auth', authRouter);
 
 // Routes
 app.post('/api/folders', isAuthenticated, addFolder);
-app.post('/api/pdfs/upload', isAuthenticated, upload.single('pdf'), uploadFile);
-app.delete('/api/pdfs/:folder/:id', isAuthenticated, deleteFile);
+app.post('/api/file/upload', isAuthenticated, upload.single('file'), uploadFile);
+app.delete('/api/file/:folder/:id', isAuthenticated, deleteFile);
 app.delete('/api/folders/:folderName', isAuthenticated, deleteFolder);
 app.post('/api/files/move', isAuthenticated, moveFile);
 
-app.get('/api/pdfs/:folder/:id/download', downloadFile); 
+app.get('/api/file/:folder/:id/download', downloadFile); 
 app.get('/api/folders', getFolders);
 app.get('/api/contact', getContact);
 

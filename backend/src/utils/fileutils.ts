@@ -16,7 +16,6 @@ export const getShortFileType = (mimeType: string, originalFilename: string): st
         }
     }
   
-  // If both fail, fallback to mime type part
   if (!extension) {
     extension = mimeType.split('/')[1] || mimeType.split('/')[0];
   }
@@ -24,7 +23,7 @@ export const getShortFileType = (mimeType: string, originalFilename: string): st
   return extension.toString();
 };
 
-
+// Formats date for frontend
 export const formatDate = (date: Date): string => {
     return date.toLocaleString('en-US', {
       year: 'numeric',
@@ -37,6 +36,7 @@ export const formatDate = (date: Date): string => {
     });
 };
 
+// Prepares and sanitizes file name to be used for download of the file
 export const sanitizeFileName = (fileName: string): string => {
     return encodeURIComponent(fileName)
       .replace(/['()]/g, escape)

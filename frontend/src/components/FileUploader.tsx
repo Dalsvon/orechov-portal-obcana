@@ -264,12 +264,12 @@ const FileUploader: React.FC<FileUploaderProps> = ({
 
     try {
       const formData = new FormData();
-      formData.append('pdf', file);
+      formData.append('file', file);
       formData.append('name', name);
       formData.append('description', description);
       formData.append('folder', folder);
 
-      await axiosInstance.post('/api/pdfs/upload', formData, {
+      await axiosInstance.post('/api/file/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
