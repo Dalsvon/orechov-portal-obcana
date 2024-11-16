@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { isAdminState } from '../atoms/atoms';
@@ -8,50 +8,47 @@ import FileUploader from '../components/FileUploader';
 import Toast from '../notifications/Toast';
 import { Plus, X } from 'lucide-react';
 
-interface PDF {
+interface File {
   id: string;
   name: string;
   description: string;
   folder: string;
   fileSize: number;
   fileType: string;
-}
-
-interface Toast {
-  message: string;
-  type: 'success' | 'error';
+  fromWebsite: boolean;
 }
 
 const FolderContent: React.FC = () => {
   const { folderName } = useParams<{ folderName: string }>();
   const navigate = useNavigate();
   const isAdmin = useRecoilValue(isAdminState);
-  const [files, setFiles] = useState<PDF[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<{id: string, name: string} | null>(null);
-  const [toast, setToast] = useState<Toast | null>(null);
+  const [toast, setToast] = useState<{message: string; type: 'success' | 'error'} | null>(null);
   const [showUploader, setShowUploader] = useState(false);
 
-  const fetchFolderContent = async () => {
+  const fetchFolderContent = useCallback(async () => {
     if (!folderName) return;
     
     try {
       setIsLoading(true);
-      const response = await axiosInstance.get<{ name: string; files: PDF[] }[]>('/api/folders');
-      const folder = response.data.find(f => f.name === decodeURIComponent(folderName));
-      if (folder) {
-        setFiles(folder.files || []);
-      } else {
-        setError('Složka nebyla nalezena');
-      }
+      const response = await axiosInstance.get<File[]>(
+        `/api/folders/${encodeURIComponent(folderName)}/files`
+      );
+      setFiles(response.data);
     } catch (error) {
       console.error('Error fetching folder content:', error);
       setError('Nepodařilo se načíst obsah složky');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [folderName]);
+  
+  useEffect(() => {
+    fetchFolderContent();
+  }, [fetchFolderContent]);
 
   useEffect(() => {
     const handleToast = (event: CustomEvent) => {
@@ -64,10 +61,6 @@ const FolderContent: React.FC = () => {
       window.removeEventListener('showToast', handleToast as EventListener);
     };
   }, []);
-
-  useEffect(() => {
-    fetchFolderContent();
-  }, [folderName]);
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
@@ -166,7 +159,7 @@ const FolderContent: React.FC = () => {
           onClick={() => navigate('/')}
           className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-sm flex items-center transition-colors"
         >
-          ← Zpět na složky
+          ← Zpět na formuláře
         </button>
       </div>
 

@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { Admin } from '../types/auth.types';
+import { Admin } from '../types/authTypes';
 import bcrypt from 'bcrypt';
 
 // Handles admin repository access
@@ -35,9 +35,5 @@ export class AdminRepository {
         updatedAt: new Date()
       }
     });
-  }
-
-  async verifyPassword(hashedPassword: string, plainPassword: string): Promise<boolean> {
-    return bcrypt.compare(plainPassword, hashedPassword);
   }
 }

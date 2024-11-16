@@ -1,6 +1,7 @@
 import { AdminRepository } from '../repositories/admin';
 import { ContactRepository } from '../repositories/contact';
 import prisma from '../database/prisma';
+import bcrypt from 'bcrypt';
 
 // Initializes admin account and basic contact
 export const initializeSystem = async (): Promise<void> => {
@@ -19,7 +20,6 @@ export const initializeSystem = async (): Promise<void> => {
       }
 
       await adminRepository.create('admin', defaultPassword);
-      console.log('Admin account initialized');
     }
 
     // Initialize contact
@@ -27,11 +27,13 @@ export const initializeSystem = async (): Promise<void> => {
 
     if (!contactExists) {
       await contactRepository.create('Obec Ořechov');
-      console.log('Contact initialized');
     }
 
   } catch (error) {
-    console.error('Error during system initialization:', error);
     throw error;
   }
 };
+
+export const verifyPassword = async (hashedPassword: string, plainPassword: string): Promise<boolean> => {
+  return bcrypt.compare(plainPassword, hashedPassword);
+}

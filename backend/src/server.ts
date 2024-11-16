@@ -9,8 +9,10 @@ import addFolder from './controllers/addFolder';
 import deleteFolder from './controllers/deleteFolder';
 import moveFile from './controllers/moveFile';
 import getContact from './controllers/getContact';
+import getFiles from './controllers/getFiles'
 import authRouter, { sessionMiddleware, isAuthenticated } from './auth/auth';
-import { initializeSystem } from './services/initializer';
+import { initializeSystem } from './services/services';
+import { securityHeaders } from './middleware/securityHeaders';
 
 const app = express();
 
@@ -24,6 +26,7 @@ app.use(cors({
 }));
 
 app.use(sessionMiddleware);
+app.use(securityHeaders);
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -53,6 +56,7 @@ app.delete('/api/folders/:folderName', isAuthenticated, deleteFolder);
 app.post('/api/files/move', isAuthenticated, moveFile);
 
 app.get('/api/file/:folder/:id/download', downloadFile); 
+app.get('/api/folders/:folderName/files', getFiles);
 app.get('/api/folders', getFolders);
 app.get('/api/contact', getContact);
 

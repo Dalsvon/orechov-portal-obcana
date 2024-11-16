@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { Contact } from '../types/contact.types';
+import { Contact } from '../types/contactTypes';
 
 // Handles contact repository access
 export class ContactRepository {

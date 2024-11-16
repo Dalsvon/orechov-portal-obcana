@@ -15,7 +15,7 @@ root.render(
       <BrowserRouter>
         <App />
       </BrowserRouter>
-      </RecoilRoot>
+    </RecoilRoot>
   </React.StrictMode>
 );
 

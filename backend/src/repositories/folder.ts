@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { Folder, FolderName, FolderWithFileIds } from '../types/folder.types';
+import { Folder, FolderName, FolderWithFileIds, FolderWithCount } from '../types/folderTypes';
 
 // Handles repository access for folders
 export class FolderRepository {
@@ -29,13 +29,18 @@ export class FolderRepository {
     });
   }
 
-  async findAll(): Promise<Folder[]> {
+  async findAllWithCounts(): Promise<FolderWithCount[]> {
     return this.prisma.folder.findMany({
-      include: {
-        files: true
-      }
+        select: {
+            name: true,
+            _count: {
+                select: {
+                    files: true
+                }
+            }
+        }
     });
-  }
+ } 
 
   async delete(id: string): Promise<void> {
     await this.prisma.$transaction(async (tx) => {

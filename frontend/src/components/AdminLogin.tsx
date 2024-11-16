@@ -53,6 +53,7 @@ const AdminLogin: React.FC = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 disabled={isSubmitting}
+                autoComplete="username"
               />
             </div>
             <div>
@@ -69,6 +70,7 @@ const AdminLogin: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isSubmitting}
+                autoComplete="current-password"
               />
             </div>
           </div>

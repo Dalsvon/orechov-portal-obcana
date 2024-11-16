@@ -1,16 +1,25 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import { isAdminState } from './atoms/atoms';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import Folders from './pages/Folders';
-import FolderContent from './pages/FolderContent';
-import Contacts from './pages/Contacts';
-import AdminLogin from './components/AdminLogin';
-import AdminPage from './pages/AdminPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import axiosInstance from './services/axiosInstance';
+import Error404 from './pages/Error404';
+import Folders from './pages/Folders';
+import FolderContent from './pages/FolderContent';
+import ErrorBoundary from './components/ErrorBoundry';
+
+const Contacts = React.lazy(() => import('./pages/Contacts'));
+const AdminLogin = React.lazy(() => import('./components/AdminLogin'));
+const AdminPage = React.lazy(() => import('./pages/AdminPage'));
+
+const LoadingFallback = () => (
+  <div className="flex justify-center items-center min-h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-700"></div>
+  </div>
+);
 
 const App: React.FC = () => {
   const setIsAdmin = useSetRecoilState(isAdminState);
@@ -30,25 +39,30 @@ const App: React.FC = () => {
   }, [setIsAdmin]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="flex-1 px-4 mb-16">
-        <Routes>
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={
-            <ProtectedRoute>
-              <AdminPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/" element={<Folders />} />
-          <Route path="/folder/:folderName" element={<FolderContent />} />
-          <Route path="/contacts" element={<Contacts />} />
-        </Routes>
-      </main>
+    <ErrorBoundary>
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        
+        <main className="flex-1 px-4 mb-16">
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin" element={
+                <ProtectedRoute>
+                  <AdminPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/" element={<Folders />} />
+              <Route path="/folder/:folderName" element={<FolderContent />} />
+              <Route path="/contacts" element={<Contacts />} />
+              <Route path="*" element={<Error404 />} />
+            </Routes>
+          </Suspense>
+        </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </ErrorBoundary>
   );
 };
 

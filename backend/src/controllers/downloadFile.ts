@@ -1,13 +1,12 @@
 import { RequestHandler } from 'express';
 import { FileRepository } from '../repositories/file';
 import prisma from '../database/prisma';
-import { sanitizeFileName } from '../utils/fileutils';
-import { DownloadFileRequest } from '../types/file.types'
+import { sanitizeFileName } from '../utils/filesUtils';
 
 const fileRepository = new FileRepository(prisma);
 
 // Sends client a file in a form of Buffer
-const downloadFile: RequestHandler<DownloadFileRequest> = async (req, res, next) => {
+const downloadFile: RequestHandler = async (req, res, next) => {
   try {
     const { folder, id } = req.params;
 

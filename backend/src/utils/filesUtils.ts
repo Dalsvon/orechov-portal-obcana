@@ -13,13 +13,13 @@ export const getShortFileType = (mimeType: string, originalFilename: string): st
         if (extractedExtension) {
             extension = extractedExtension.toLowerCase();
         }
-        }
+      }
     }
   
   if (!extension) {
     extension = mimeType.split('/')[1] || mimeType.split('/')[0];
   }
-
+  
   return extension.toString();
 };
 

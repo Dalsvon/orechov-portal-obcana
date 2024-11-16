@@ -4,8 +4,8 @@ import prisma from '../database/prisma';
 
 const folderRepository = new FolderRepository(prisma);
 
-// Removes folder from database if it exists and is empty
-const deleteFolder: RequestHandler = async (req, res, next) => {
+// Removes a folder from database if it exists and is empty.
+const deleteFolder: RequestHandler = async (req, res) => {
   try {
     const { folderName } = req.params;
 
@@ -32,8 +32,9 @@ const deleteFolder: RequestHandler = async (req, res, next) => {
 
     res.status(200).json({ message: 'Složka byla úspěšně smazána.' });
   } catch (error) {
-    console.error('Error during folder deletion:', error);
-    next(error);
+    res.status(500).json({ 
+      error: 'Nepodařilo se smazat složku. Prosím zkuste to znovu.' 
+    });
   }
 };
 

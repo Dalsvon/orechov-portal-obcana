@@ -1,4 +1,4 @@
-export interface File {
+  export interface File {
     id: string;
     name: string;
     description: string | null;
@@ -11,7 +11,7 @@ export interface File {
     folderId: string;
   }
   
-  export interface CreateFileRep {
+  export interface CreateFile {
     name: string;
     description: string | null;
     content: Buffer;
@@ -20,21 +20,4 @@ export interface File {
     fileSize: number;
     fromWebsite: boolean;
     folderId: string;
-  }
-
-  export interface MoveFileParams {
-    fileId: string;
-    sourceFolder: string;
-    targetFolder: string;
-  }
-
-  export interface DeleteFileParams {
-    folder: string;
-    id: string;
-  }
-
-  
-   export interface DownloadFileRequest {
-    folder: string;
-    id: string;
   }

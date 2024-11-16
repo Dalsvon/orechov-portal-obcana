@@ -2,18 +2,17 @@ import { RequestHandler } from 'express';
 import { FileRepository } from '../repositories/file';
 import { FolderRepository } from '../repositories/folder';
 import prisma from '../database/prisma';
-import { MoveFileParams } from '../types/file.types';
 
 const fileRepository = new FileRepository(prisma);
 const folderRepository = new FolderRepository(prisma);
 
 const moveFile: RequestHandler = async (req, res) => {
   try {
-    const { fileId, sourceFolder, targetFolder }: MoveFileParams = req.body;
+    const { fileId, sourceFolder, targetFolder } = req.body;
 
     if (!fileId || !sourceFolder || !targetFolder) {
       res.status(400).json({ 
-        error: 'Chybí potřebné údaje pro přesun souboru' 
+        error: 'Chybí potřebné údaje pro přesun souboru.' 
       });
       return;
     }

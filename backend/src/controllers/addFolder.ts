@@ -29,7 +29,7 @@ const addFolder: RequestHandler = async (req, res) => {
       return;
     }
 
-    const existingFolder = await folderRepository.findByName(sanitizedFolderName);
+    const existingFolder = await folderRepository.findByNameWithFileIds(sanitizedFolderName);
 
     if (existingFolder) {
       res.status(409).json({ error: 'Složka s tímto názvem již existuje.' });
@@ -43,7 +43,6 @@ const addFolder: RequestHandler = async (req, res) => {
       folderName: folder.name 
     });
   } catch (error) {
-    console.error('Unexpected error in addFolder:', error);
     res.status(500).json({ 
       error: 'Nepodařilo se vytvořit složku. Prosím zkuste to znovu.' 
     });

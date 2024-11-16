@@ -1,8 +1,8 @@
 import { FileRepository } from '../repositories/file';
 import { FolderRepository } from '../repositories/folder';
 import prisma from '../database/prisma';
-import { getShortFileType, formatDate } from '../utils/fileutils';
 import { RequestHandler } from 'express';
+import { formatDate, getShortFileType } from '../utils/filesUtils';
 
 const fileRepository = new FileRepository(prisma);
 const folderRepository = new FolderRepository(prisma);
@@ -23,6 +23,11 @@ const uploadFile: RequestHandler = async (req, res): Promise<void> => {
       return;
     }
 
+    if (!buffer || !mimetype || !size) {
+      res.status(400).json({ message: 'Chybný formát souboru.' });
+      return;
+    }
+
     if (name.length > FILE_NAME_MAX_LENGTH) {
       res.status(400).json({ 
         message: `Název složky nemůže být delší než ${FILE_NAME_MAX_LENGTH} znaků.` 
@@ -38,7 +43,7 @@ const uploadFile: RequestHandler = async (req, res): Promise<void> => {
       return;
     }
 
-    const existingFile = await fileRepository.findByNameInFolder(name, existingFolder.id);
+    const existingFile = await fileRepository.findByNameInFolder(name, existingFolder.name);
 
     if (existingFile) {
       res.status(409).json({ 
@@ -70,7 +75,6 @@ const uploadFile: RequestHandler = async (req, res): Promise<void> => {
       folder
     });
   } catch (error) {
-    console.error('Error uploading file:', error);
     res.status(500).json({ 
       message: 'Při nahrávání souboru došlo k chybě. Zkuste to prosím později' 
     });

@@ -3,12 +3,14 @@ import express from 'express';
 import cookieSession from 'cookie-session';
 import { AdminRepository } from '../repositories/admin';
 import prisma from '../database/prisma';
-import { LoginRequest, ChangePasswordRequest, AuthResponse, AuthResponseCheck } from '../types/auth.types';
+import { LoginRequest, ChangePasswordRequest, AuthResponse, AuthResponseCheck } from '../types/authTypes';
+import { verifyPassword } from '../services/services';
 
 declare module 'express' {
   interface Request {
     session: {
       isAdmin?: boolean;
+      username?: string;
       [key: string]: any;
     } | null;
   }
@@ -67,7 +69,7 @@ router.post(
         return;
       }
 
-      const validPassword = await adminRepository.verifyPassword(admin.password, password);
+      const validPassword = await verifyPassword(admin.password, password);
 
       if (!validPassword) {
         res.status(401).json({ error: 'Neplatné přihlašovací údaje.' });
@@ -75,12 +77,12 @@ router.post(
       }
 
       req.session = {
-        isAdmin: true
+        isAdmin: true,
+        username: admin.username
       };
       
       res.json({ message: 'Přihlášení bylo úspěšné.' });
     } catch (error) {
-      console.error('Login error:', error);
       res.status(500).json({ error: 'Při přihlašování došlo k chybě. Skuste znovu.' });
     }
   }
@@ -114,14 +116,14 @@ router.post(
         return;
       }
 
-      const admin = await adminRepository.findFirst();
+      const admin = await adminRepository.findByUsername(req.session?.username != undefined ? req.session.username : "");
 
       if (!admin) {
         res.status(404).json({ error: 'Administrátorský účet nebyl nalezen.' });
         return;
       }
 
-      const validPassword = await adminRepository.verifyPassword(
+      const validPassword = await verifyPassword(
         admin.password,
         currentPassword
       );
@@ -135,25 +137,25 @@ router.post(
 
       res.json({ message: 'Heslo bylo úspěšně změněno.' });
     } catch (error) {
-      console.error('Change password error:', error);
       res.status(500).json({ error: 'Při změně hesla došlo k chybě. Heslo nebylo změněno.' });
     }
   }
 );
 
+// Checks admin status for refreshes and returning to the website
 router.get(
   '/check-auth',
   (req: Request, res: Response<AuthResponseCheck>): void => {
     if (!req.session) {
       res.status(401).json({ 
-        error: 'No session found',
+        error: 'Relace vypršela.',
         isAuthenticated: false 
       });
       return;
     }
 
     res.json({ 
-      message: 'Authentication status checked',
+      message: 'Administrátorský status byl skontrolován.',
       isAuthenticated: !!req.session.isAdmin 
     });
   }

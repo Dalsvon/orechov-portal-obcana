@@ -61,6 +61,14 @@ const AdminPage = () => {
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-2xl font-bold mb-6">Změnit heslo</h2>
             <form onSubmit={handlePasswordChange} className="space-y-4">
+            <input 
+              type="text" 
+              autoComplete="username" 
+              value="admin"
+              aria-hidden="true"
+              style={{ display: 'none' }}
+              readOnly
+            />
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Současné heslo
@@ -71,6 +79,7 @@ const AdminPage = () => {
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   required
+                  autoComplete="current-password"
                 />
               </div>
               <div>
@@ -83,6 +92,7 @@ const AdminPage = () => {
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   required
+                  autoComplete="new-password"
                 />
               </div>
               <div>
@@ -95,6 +105,7 @@ const AdminPage = () => {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   required
+                  autoComplete="new-password"
                 />
               </div>
               {error && (

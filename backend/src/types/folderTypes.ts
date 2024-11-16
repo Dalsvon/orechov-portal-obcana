@@ -1,3 +1,16 @@
+  export interface FolderWithCount {
+    name: string;
+    _count: {
+        files: number;
+    };
+  }
+
+  export interface FolderBasicInfo {
+    name: string;
+    fileCount: number;
+  }
+  
+  
   export interface Folder {
     id: string;
     name: string;
@@ -30,14 +43,15 @@
     uploadDate: Date;
     fileType: string;
     fileSize: number;
+    fromWebsite: boolean;
   }
   
   export interface FormattedFolderFile {
     id: string;
     name: string;
     description: string | null;
-    uploadDate: string;
     fileType: string;
     fileSize: number;
     folder: string;
+    fromWebsite: boolean;
   }

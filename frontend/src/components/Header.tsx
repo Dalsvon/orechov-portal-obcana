@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { isAdminState } from '../atoms/atoms';
-import axiosInstance from '../services/axiosInstance';
 
 const Header: React.FC = () => {
   const [isAdmin] = useRecoilState(isAdminState);
@@ -11,7 +10,6 @@ const Header: React.FC = () => {
     <header className="bg-green-700 shadow-md w-full">
       <div className="container mx-auto px-4 py-4 md:py-6">
         <nav className="flex flex-col md:flex-row items-center">
-          {/* Logo and title section */}
           <div className="flex flex-col md:flex-row items-center md:flex-1">
             <Link to="/" className="flex items-center">
               <img 
@@ -25,13 +23,13 @@ const Header: React.FC = () => {
             </h1>
           </div>
 
-          {/* Navigation links - centered on desktop, stacked on mobile */}
+          {/* Navigation links*/}
           <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-12 mt-6 md:mt-0">
             <Link 
               to="/" 
               className="text-white hover:text-green-200 font-semibold text-lg md:text-xl transition duration-150 ease-in-out py-2"
             >
-              Dokumenty
+              Formuláře a dokumenty
             </Link>
             <Link 
               to="/contacts" 

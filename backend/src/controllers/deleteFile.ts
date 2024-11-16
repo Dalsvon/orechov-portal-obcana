@@ -27,11 +27,11 @@ const deleteFile: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const file = await fileRepository.findByIdAndFolderId(id, existingFolder.id);
+    const file = await fileRepository.findByIdInFolder(id, existingFolder.id);
 
     if (!file) {
       res.status(404).json({ 
-        error: 'Soubor nebyl nalezen.' 
+        error: 'Soubor nebyl nalezen ve složce.' 
       });
       return;
     }
