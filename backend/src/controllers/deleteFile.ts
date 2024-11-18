@@ -13,7 +13,7 @@ const deleteFile: RequestHandler = async (req, res, next) => {
 
     if (!folder || !id) {
       res.status(400).json({ 
-        error: 'Chybí identifikátor složky nebo souboru.' 
+        error: 'Chybí identifikátor složky nebo souboru' 
       });
       return;
     }
@@ -22,16 +22,16 @@ const deleteFile: RequestHandler = async (req, res, next) => {
 
     if (!existingFolder) {
       res.status(404).json({ 
-        error: 'Složka nebyla nalezena.' 
+        error: 'Složka nebyla nalezena' 
       });
       return;
     }
 
-    const file = await fileRepository.findByIdInFolder(id, existingFolder.id);
+    const file = await fileRepository.findByIdInFolder(id, existingFolder.name);
 
     if (!file) {
       res.status(404).json({ 
-        error: 'Soubor nebyl nalezen ve složce.' 
+        error: 'Soubor nebyl nalezen ve složce' 
       });
       return;
     }
@@ -39,12 +39,13 @@ const deleteFile: RequestHandler = async (req, res, next) => {
     await fileRepository.delete(id);
 
     res.status(200).json({ 
-      message: 'Soubor byl úspěšně smazán.',
+      message: 'Soubor byl úspěšně smazán',
       deletedFileId: id 
     });
   } catch (error) {
-    console.error('Error during file deletion:', error);
-    next(error);
+    res.status(500).json({ 
+      error: 'Nepodařilo se smazat soubor. Prosím zkuste to znovu' 
+    });
   }
 };
 

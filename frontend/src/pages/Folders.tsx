@@ -3,7 +3,7 @@ import axiosInstance from '../services/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { isAdminState } from '../atoms/atoms';
-import FolderCreator from '../components/FolderCreator';
+import FolderCreator from '../forms/FolderCreator';
 import Toast from '../notifications/Toast';
 import { X } from 'lucide-react';
 
@@ -60,6 +60,11 @@ const Folders: React.FC = () => {
     navigate(`/folder/${encodeURIComponent(folderName)}`);
   };
 
+  const onFolderCreated = (folderName: string) => {
+    fetchFolders();
+    showToast(`Složka ${folderName} byla úspěšně vytvořena`, 'success');
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
@@ -91,7 +96,7 @@ const Folders: React.FC = () => {
       </h2>
       
       <div className="mb-8">
-        <FolderCreator onFolderCreated={fetchFolders} />
+        <FolderCreator onFolderCreated={onFolderCreated} />
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

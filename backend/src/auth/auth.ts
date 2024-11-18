@@ -4,7 +4,7 @@ import cookieSession from 'cookie-session';
 import { AdminRepository } from '../repositories/admin';
 import prisma from '../database/prisma';
 import { LoginRequest, ChangePasswordRequest, AuthResponse, AuthResponseCheck } from '../types/authTypes';
-import { verifyPassword } from '../services/services';
+import { verifyPassword } from '../services/authServices';
 
 declare module 'express' {
   interface Request {
@@ -41,12 +41,12 @@ export const sessionMiddleware = cookieSession({
 // Function to check if the user is authenticated for admin action
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction): void => {
   if (!req.session) {
-    res.status(401).json({ error: 'Relace vypršela.' });
+    res.status(401).json({ error: 'Relace vypršela' });
     return;
   }
 
   if (!req.session.isAdmin) {
-    res.status(401).json({ error: 'Neoprávněný přístup.' });
+    res.status(401).json({ error: 'Neoprávněný přístup' });
     return;
   }
   next();
@@ -65,14 +65,14 @@ router.post(
       const admin = await adminRepository.findByUsername(username);
 
       if (!admin) {
-        res.status(401).json({ error: 'Neplatné přihlašovací údaje.' });
+        res.status(401).json({ error: 'Neplatné přihlašovací údaje' });
         return;
       }
 
       const validPassword = await verifyPassword(admin.password, password);
 
       if (!validPassword) {
-        res.status(401).json({ error: 'Neplatné přihlašovací údaje.' });
+        res.status(401).json({ error: 'Neplatné přihlašovací údaje' });
         return;
       }
 
@@ -81,9 +81,9 @@ router.post(
         username: admin.username
       };
       
-      res.json({ message: 'Přihlášení bylo úspěšné.' });
+      res.json({ message: 'Přihlášení bylo úspěšné' });
     } catch (error) {
-      res.status(500).json({ error: 'Při přihlašování došlo k chybě. Skuste znovu.' });
+      res.status(500).json({ error: 'Při přihlašování došlo k chybě. Skuste znovu' });
     }
   }
 );
@@ -94,7 +94,7 @@ router.post(
   (req: Request, res: Response<AuthResponse>): void => {
     req.session = null;
     res.clearCookie('session');
-    res.json({ message: 'Odhlášení bylo úspěšné.' });
+    res.json({ message: 'Odhlášení bylo úspěšné' });
   }
 );
 
@@ -111,7 +111,7 @@ router.post(
 
       if (!newPassword || newPassword.length < 12) {
         res.status(400).json({ 
-          error: 'Nové heslo musí mít alespoň 12 znaků.' 
+          error: 'Nové heslo musí mít alespoň 12 znaků' 
         });
         return;
       }
@@ -119,7 +119,7 @@ router.post(
       const admin = await adminRepository.findByUsername(req.session?.username != undefined ? req.session.username : "");
 
       if (!admin) {
-        res.status(404).json({ error: 'Administrátorský účet nebyl nalezen.' });
+        res.status(404).json({ error: 'Administrátorský účet nebyl nalezen' });
         return;
       }
 
@@ -129,15 +129,15 @@ router.post(
       );
 
       if (!validPassword) {
-        res.status(401).json({ error: 'Zadané administrátorské heslo není správné.' });
+        res.status(401).json({ error: 'Zadané administrátorské heslo není správné' });
         return;
       }
 
       await adminRepository.updatePassword(admin.id, newPassword);
 
-      res.json({ message: 'Heslo bylo úspěšně změněno.' });
+      res.json({ message: 'Heslo bylo úspěšně změněno' });
     } catch (error) {
-      res.status(500).json({ error: 'Při změně hesla došlo k chybě. Heslo nebylo změněno.' });
+      res.status(500).json({ error: 'Při změně hesla došlo k chybě. Heslo nebylo změněno' });
     }
   }
 );
@@ -148,14 +148,14 @@ router.get(
   (req: Request, res: Response<AuthResponseCheck>): void => {
     if (!req.session) {
       res.status(401).json({ 
-        error: 'Relace vypršela.',
+        error: 'Relace vypršela',
         isAuthenticated: false 
       });
       return;
     }
 
     res.json({ 
-      message: 'Administrátorský status byl skontrolován.',
+      message: 'Administrátorský status byl skontrolován',
       isAuthenticated: !!req.session.isAdmin 
     });
   }

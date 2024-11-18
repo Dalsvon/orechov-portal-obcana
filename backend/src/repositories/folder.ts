@@ -49,7 +49,7 @@ export class FolderRepository {
       });
 
       if (fileCount > 0) {
-        throw new Error('Nelze smazat složku, která obsahuje soubory. Nejprve smažte nebo přesuňte všechny soubory.');
+        throw new Error('Nelze smazat složku, která obsahuje soubory. Nejprve smažte nebo přesuňte všechny soubory');
       }
 
       await tx.folder.delete({

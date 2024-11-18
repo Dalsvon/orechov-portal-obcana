@@ -79,8 +79,7 @@ const Contacts = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
-      {/* Hlavní kontaktní informace */}
+    <div className="max-w-6xl mx-auto p-6 space-y-8">
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-2xl font-bold mb-6">{contact.name}</h2>
         <div className="grid md:grid-cols-2 gap-6">

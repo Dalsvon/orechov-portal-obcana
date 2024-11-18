@@ -1,8 +1,9 @@
 import { RequestHandler } from 'express';
 import { FolderRepository } from '../repositories/folder';
 import prisma from '../database/prisma';
+import { checkLength, FOLDER_NAME_MAX_LENGTH } from '../services/folderServices';
+import { create } from 'domain';
 
-const FOLDER_NAME_MAX_LENGTH = 100;
 const folderRepository = new FolderRepository(prisma);
 
 // Adds a new folder for storing files if folder with given name doesn't exist already.
@@ -11,20 +12,22 @@ const addFolder: RequestHandler = async (req, res) => {
     const { folderName } = req.body;
 
     if (!folderName || typeof folderName !== 'string') {
-      res.status(400).json({ error: 'Zadejte platný název složky.' });
+      res.status(400).json({ error: 'Zadejte platný název složky' });
       return;
     }
 
     const sanitizedFolderName = folderName.trim();
 
     if (sanitizedFolderName.length === 0) {
-      res.status(400).json({ error: 'Název složky nemůže být prázdný.' });
+      res.status(400).json({ error: 'Název složky nemůže být prázdný' });
       return;
     }
 
-    if (sanitizedFolderName.length > FOLDER_NAME_MAX_LENGTH) {
+    
+
+    if (checkLength(sanitizedFolderName)) {
       res.status(400).json({ 
-        error: `Název složky nemůže být delší než ${FOLDER_NAME_MAX_LENGTH} znaků.` 
+        error: `Název složky nemůže být delší než ${FOLDER_NAME_MAX_LENGTH} znaků` 
       });
       return;
     }
@@ -32,7 +35,7 @@ const addFolder: RequestHandler = async (req, res) => {
     const existingFolder = await folderRepository.findByNameWithFileIds(sanitizedFolderName);
 
     if (existingFolder) {
-      res.status(409).json({ error: 'Složka s tímto názvem již existuje.' });
+      res.status(409).json({ error: 'Složka s tímto názvem již existuje' });
       return;
     }
 

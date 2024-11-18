@@ -8,7 +8,7 @@ interface OfficeHours {
   time: string;
 }
 
-interface Contact {
+interface ContactFooter {
   name: string;
   address: string | null;
   phone: string | null;
@@ -18,7 +18,7 @@ interface Contact {
 }
 
 const Footer: React.FC = () => {
-  const [contact, setContact] = useState<Contact | null>(null);
+  const [contact, setContact] = useState<ContactFooter | null>(null);
 
   useEffect(() => {
     const fetchContact = async () => {
@@ -114,6 +114,16 @@ const Footer: React.FC = () => {
               ))}
             </div>
           </div>
+        </div>
+        
+        <div style={{
+          borderTop: '1px solid #dee2e6',
+          paddingTop: '1rem',
+          textAlign: 'center',
+          color: '#666',
+          fontSize: '0.875rem'
+        }}>
+          © 2002-2024 Obec Ořechov
         </div>
       </div>
     </footer>

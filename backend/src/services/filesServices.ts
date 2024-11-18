@@ -1,4 +1,8 @@
 import mimeTypes from 'mime-types';
+import { FolderFile, FormattedFolderFile } from '../types/fileTypes';
+import { FolderWithFileIds } from '../types/folderTypes';
+
+export const FILE_NAME_MAX_LENGTH = 100;
 
 // Returns short mimetype for file
 export const getShortFileType = (mimeType: string, originalFilename: string): string => {
@@ -38,7 +42,32 @@ export const formatDate = (date: Date): string => {
 
 // Prepares and sanitizes file name to be used for download of the file
 export const sanitizeFileName = (fileName: string): string => {
-    return encodeURIComponent(fileName)
-      .replace(/['()]/g, escape)
-      .replace(/\*/g, '_');
-  };
+  return fileName
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/[^a-zA-Z0-9\-\.]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+};
+
+export const formatFolderFile = (files: FolderFile[], folderName: string): FormattedFolderFile[] => {
+  return files.map(file => ({
+    id: file.id,
+    name: file.name,
+    description: file.description,
+    fileType: file.fileType,
+    fileSize: file.fileSize,
+    folder: folderName,
+    fromWebsite: file.fromWebsite
+  }));
+};
+
+export const doesFileExistInFolder = (folder: FolderWithFileIds, fileId: string): boolean => {
+  return folder.files.some(file => file.id === fileId);
+};
+
+// Checks length of a name
+export const checkLength = (name: string): boolean => {
+  return name.length > FILE_NAME_MAX_LENGTH;
+}

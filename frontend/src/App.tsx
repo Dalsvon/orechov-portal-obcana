@@ -12,7 +12,7 @@ import FolderContent from './pages/FolderContent';
 import ErrorBoundary from './components/ErrorBoundry';
 
 const Contacts = React.lazy(() => import('./pages/Contacts'));
-const AdminLogin = React.lazy(() => import('./components/AdminLogin'));
+const AdminLogin = React.lazy(() => import('./forms/AdminLogin'));
 const AdminPage = React.lazy(() => import('./pages/AdminPage'));
 
 const LoadingFallback = () => (

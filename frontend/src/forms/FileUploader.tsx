@@ -5,7 +5,7 @@ import Toast from '../notifications/Toast';
 interface FileUploaderProps {
   defaultFolder?: string;
   hideFolder?: boolean;
-  onUploadComplete?: () => void;
+  onUploadComplete?: (fileName: string) => void;
 }
 
 const FileUploader: React.FC<FileUploaderProps> = ({ 
@@ -73,7 +73,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({
     }
   };
 
-  const handleUpload = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     if (!file || !name || !folder) {
       showToast('Prosím vyplňte název, vyberte soubor a složku', 'error');
       return;
@@ -88,21 +90,22 @@ const FileUploader: React.FC<FileUploaderProps> = ({
       formData.append('description', description);
       formData.append('folder', folder);
 
-      await axiosInstance.post('/api/file/upload', formData, {
+      const response = await axiosInstance.post('/api/file/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      showToast('Soubor byl úspěšně nahrán', 'success');
+      showToast(`Soubor ${response.data.name} byl úspěšně nahrán`, 'success');
+
       resetForm();
       
       if (onUploadComplete) {
-        onUploadComplete();
+        onUploadComplete(response.data.name);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Chyba při nahrávání souboru:', error);
-      showToast('Nepodařilo se nahrát soubor', 'error');
+      showToast(error.response?.data?.message || 'Nepodařilo se nahrát soubor', 'error');
     } finally {
       setUploading(false);
     }
@@ -118,7 +121,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         />
       )}
 
-      <div className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">
             Vybrat soubor
@@ -127,7 +130,11 @@ const FileUploader: React.FC<FileUploaderProps> = ({
             type="file"
             onChange={handleFileChange}
             disabled={uploading}
-            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 
+                     file:px-4 file:rounded-md file:border-0 file:text-sm 
+                     file:font-semibold file:bg-indigo-50 file:text-indigo-700 
+                     hover:file:bg-indigo-100"
+            required
           />
         </div>
 
@@ -140,7 +147,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({
             placeholder="Zadejte název souboru"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md 
+                     shadow-sm focus:outline-none focus:ring-indigo-500 
+                     focus:border-indigo-500"
             disabled={uploading}
             required
           />
@@ -154,7 +163,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({
             placeholder="Zadejte popis souboru"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md 
+                     shadow-sm focus:outline-none focus:ring-indigo-500 
+                     focus:border-indigo-500"
             disabled={uploading}
             rows={3}
           />
@@ -168,7 +179,9 @@ const FileUploader: React.FC<FileUploaderProps> = ({
             <select
               value={folder}
               onChange={(e) => setFolder(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md 
+                       shadow-sm focus:outline-none focus:ring-indigo-500 
+                       focus:border-indigo-500"
               disabled={uploading || !!defaultFolder}
               required
             >
@@ -183,13 +196,17 @@ const FileUploader: React.FC<FileUploaderProps> = ({
         )}
 
         <button
-          onClick={handleUpload}
-          disabled={!file || uploading}
-          className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          type="submit"
+          disabled={uploading || !file}
+          className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md 
+                   hover:bg-indigo-700 focus:outline-none focus:ring-2 
+                   focus:ring-indigo-500 focus:ring-offset-2 
+                   disabled:opacity-50 disabled:cursor-not-allowed
+                   transition-colors duration-200"
         >
           {uploading ? 'Nahrávání...' : 'Nahrát soubor'}
         </button>
-      </div>
+      </form>
     </div>
   );
 };

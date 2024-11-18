@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { isAdminState } from '../atoms/atoms';
 import axiosInstance from '../services/axiosInstance';
-import Movefile from '../components/Movefile';
-import FileUploader from '../components/FileUploader';
+import Movefile from '../components/FileMove';
+import FileUploader from '../forms/FileUploader';
 import Toast from '../notifications/Toast';
 import { Plus, X } from 'lucide-react';
 
@@ -106,9 +106,10 @@ const FolderContent: React.FC = () => {
     }
   };
 
-  const handleUploadComplete = () => {
+  const handleUploadComplete = (fileName: string) => {
     fetchFolderContent();
     setShowUploader(false);
+    showToast(`Soubor ${fileName} byl úspěšně nahrán`, 'success');
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -159,7 +160,7 @@ const FolderContent: React.FC = () => {
           onClick={() => navigate('/')}
           className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-sm flex items-center transition-colors"
         >
-          ← Zpět na formuláře
+          ← Zpět na Formuláře a dokumenty
         </button>
       </div>
 
@@ -190,7 +191,7 @@ const FolderContent: React.FC = () => {
                   )}
                   <div className="flex gap-4 text-sm text-gray-500">
                     <span>Velikost: {formatFileSize(file.fileSize)}</span>
-                    <span>Typ: {file.fileType.toUpperCase()}</span>
+                    <span>Formát: {"." + file.fileType}</span>
                   </div>
                 </div>
                 

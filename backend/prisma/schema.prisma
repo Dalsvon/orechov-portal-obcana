@@ -41,22 +41,22 @@ model File {
 
 // Singleton contact
 model Contact {
-  createdAt    DateTime @default(now())
+  id           Int           @id @default(1)
+  createdAt    DateTime      @default(now())
   name         String
   address      String?
   phone        String?
   mobile       String?
   email        String?
   maintenence  String?
-  data_id      String?
+  dataId       String?
   ic           String?
   dic          String?
-  bank_account String?
-  last_updated DateTime @updatedAt
-  officeHours OfficeHours[]
-  employees   Employee[]
+  bankAccount  String?
+  lastUpdated  DateTime      @updatedAt
+  officeHours  OfficeHours[]
+  employees    Employee[]
 
-  @@unique([createdAt], name: "singleton")
   @@map("contact")
 }
 
@@ -64,8 +64,8 @@ model OfficeHours {
   id        Int      @id @default(autoincrement())
   days      String
   time      String
-  contact   Contact  @relation(fields: [contactId], references: [createdAt], onDelete: Cascade)
-  contactId DateTime
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contactId Int
 
   @@map("office_hours")
 }
@@ -76,8 +76,8 @@ model Employee {
   position  String?
   phone     String?
   email     String?
-  contact   Contact  @relation(fields: [contactId], references: [createdAt], onDelete: Cascade)
-  contactId DateTime
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contactId Int
 
   @@map("employees")
 }

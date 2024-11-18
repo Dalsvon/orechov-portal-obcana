@@ -21,3 +21,23 @@
     fromWebsite: boolean;
     folderId: string;
   }
+
+  export interface FolderFile {
+    id: string;
+    name: string;
+    description: string | null;
+    uploadDate: Date;
+    fileType: string;
+    fileSize: number;
+    fromWebsite: boolean;
+  }
+  
+  export interface FormattedFolderFile {
+    id: string;
+    name: string;
+    description: string | null;
+    fileType: string;
+    fileSize: number;
+    folder: string;
+    fromWebsite: boolean;
+  }

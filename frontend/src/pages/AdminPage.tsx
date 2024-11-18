@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import { isAdminState } from '../atoms/atoms';
 import axiosInstance from '../services/axiosInstance';
-import FileUploader from '../components/FileUploader';
+import FileUploader from '../forms/FileUploader';
 
 const AdminPage = () => {
   const [currentPassword, setCurrentPassword] = useState('');

@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
+import rateLimit from 'express-rate-limit';
 import uploadFile from './controllers/uploadFile';
 import downloadFile from './controllers/downloadFile';
 import getFolders from './controllers/getFolders';
@@ -11,8 +12,8 @@ import moveFile from './controllers/moveFile';
 import getContact from './controllers/getContact';
 import getFiles from './controllers/getFiles'
 import authRouter, { sessionMiddleware, isAuthenticated } from './auth/auth';
-import { initializeSystem } from './services/services';
 import { securityHeaders } from './middleware/securityHeaders';
+import initializeSystem from './initialization/initializeSystem';
 
 const app = express();
 
@@ -38,6 +39,13 @@ const upload = multer({
     fileSize: 200 * 1024 * 1024, // 200MB limit
   },
 });
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests
+});
+
+app.use(limiter);
 
 // Error handling middleware
 const errorHandler: express.ErrorRequestHandler = (err, req, res, next) => {

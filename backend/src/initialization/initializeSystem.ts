@@ -1,10 +1,9 @@
 import { AdminRepository } from '../repositories/admin';
 import { ContactRepository } from '../repositories/contact';
 import prisma from '../database/prisma';
-import bcrypt from 'bcrypt';
 
 // Initializes admin account and basic contact
-export const initializeSystem = async (): Promise<void> => {
+const initializeSystem = async (): Promise<void> => {
   const adminRepository = new AdminRepository(prisma);
   const contactRepository = new ContactRepository(prisma);
 
@@ -33,7 +32,4 @@ export const initializeSystem = async (): Promise<void> => {
     throw error;
   }
 };
-
-export const verifyPassword = async (hashedPassword: string, plainPassword: string): Promise<boolean> => {
-  return bcrypt.compare(plainPassword, hashedPassword);
-}
+export default initializeSystem;

@@ -18,7 +18,7 @@ const getFolders: RequestHandler = async (req, res) => {
     res.json(formattedFolders);
   } catch (error) {
     res.status(500).json({ 
-      error: 'Nepodařilo se načíst složky. Zkuste to prosím později.' 
+      error: 'Nepodařilo se načíst složky. Zkuste to prosím později' 
     });
   }
 };

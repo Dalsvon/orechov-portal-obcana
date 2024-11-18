@@ -32,7 +32,7 @@ export class ContactRepository {
     return this.prisma.contact.create({
       data: {
         name,
-        last_updated: new Date(),
+        lastUpdated: new Date(),
         officeHours: {
           create: []
         },
