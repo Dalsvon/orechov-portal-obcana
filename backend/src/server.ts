@@ -49,7 +49,6 @@ app.use(limiter);
 
 // Error handling middleware
 const errorHandler: express.ErrorRequestHandler = (err, req, res, next) => {
-  console.error(err.stack);
   res.status(500).json({ error: 'Nastala neočekávaná chyba na strane serveru' });
 };
 

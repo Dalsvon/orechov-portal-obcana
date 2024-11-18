@@ -10,6 +10,7 @@ import Error404 from './pages/Error404';
 import Folders from './pages/Folders';
 import FolderContent from './pages/FolderContent';
 import ErrorBoundary from './components/ErrorBoundry';
+import { HelmetProvider } from 'react-helmet-async';
 
 const Contacts = React.lazy(() => import('./pages/Contacts'));
 const AdminLogin = React.lazy(() => import('./forms/AdminLogin'));
@@ -39,30 +40,32 @@ const App: React.FC = () => {
   }, [setIsAdmin]);
 
   return (
-    <ErrorBoundary>
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        
-        <main className="flex-1 px-4 mb-16">
-          <Suspense fallback={<LoadingFallback />}>
-            <Routes>
+    <HelmetProvider>
+      <ErrorBoundary>
+        <div className="min-h-screen flex flex-col">
+          <Header />
+          
+          <main className="flex-1 px-4 mb-16">
+            <Suspense fallback={<LoadingFallback />}>
+              <Routes>
               <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin" element={
-                <ProtectedRoute>
-                  <AdminPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/" element={<Folders />} />
-              <Route path="/folder/:folderName" element={<FolderContent />} />
-              <Route path="/contacts" element={<Contacts />} />
-              <Route path="*" element={<Error404 />} />
-            </Routes>
-          </Suspense>
-        </main>
+                <Route path="/admin" element={
+                  <ProtectedRoute>
+                    <AdminPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/" element={<Folders />} />
+                <Route path="/folder/:folderName" element={<FolderContent />} />
+                <Route path="/contacts" element={<Contacts />} />
+                <Route path="*" element={<Error404 />} />
+              </Routes>
+            </Suspense>
+          </main>
 
-        <Footer />
-      </div>
-    </ErrorBoundary>
+          <Footer />
+        </div>
+      </ErrorBoundary>
+    </HelmetProvider>
   );
 };
 

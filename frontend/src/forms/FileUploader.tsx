@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axiosInstance from '../services/axiosInstance';
 import Toast from '../notifications/Toast';
 
@@ -21,19 +21,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   const [uploading, setUploading] = useState(false);
   const [toast, setToast] = useState<{message: string; type: 'success' | 'error'} | null>(null);
 
-  useEffect(() => {
-    if (!hideFolder) {
-      fetchFolders();
-    }
-  }, [hideFolder]);
-
-  useEffect(() => {
-    if (defaultFolder) {
-      setFolder(defaultFolder);
-    }
-  }, [defaultFolder]);
-
-  const fetchFolders = async () => {
+  const fetchFolders = useCallback(async () => {
     try {
       const response = await axiosInstance.get('/api/folders');
       setFolders(response.data.map((folder: any) => folder.name));
@@ -44,13 +32,24 @@ const FileUploader: React.FC<FileUploaderProps> = ({
       console.error('Chyba při načítání složek:', error);
       showToast('Nepodařilo se načíst složky', 'error');
     }
-  };
+  }, [defaultFolder]);
+
+  useEffect(() => {
+    if (!hideFolder) {
+      fetchFolders();
+    }
+  }, [hideFolder, fetchFolders]);
+
+  useEffect(() => {
+    if (defaultFolder) {
+      setFolder(defaultFolder);
+    }
+  }, [defaultFolder]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const selectedFile = event.target.files[0];
       setFile(selectedFile);
-      // Set the file name as default name, removing the extension
       const nameWithoutExtension = selectedFile.name.replace(/\.[^/.]+$/, '');
       setName(nameWithoutExtension);
     }
