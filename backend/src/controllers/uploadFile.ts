@@ -64,7 +64,7 @@ const uploadFile: RequestHandler = async (req, res): Promise<void> => {
       folderId: existingFolder.id
     });
 
-    res.status(200).json({ message: 'File created successfully' });
+    res.status(200).json({ message: 'File created successfully' , name: name });
   } catch (error) {
     res.status(500).json({ 
       message: 'Při nahrávání souboru došlo k chybě. Zkuste to prosím později' 

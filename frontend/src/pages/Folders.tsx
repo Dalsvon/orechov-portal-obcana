@@ -33,7 +33,7 @@ const Folders: React.FC = () => {
       setFolders(response.data);
     } catch (error) {
       console.error('Error fetching folders:', error);
-      setError(`Failed to load folders. ${error instanceof Error ? error.message : String(error)}`);
+      setError(`Nepodařilo se nahrát soubory. ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsLoading(false);
     }
@@ -98,7 +98,7 @@ const Folders: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Portál občana obce Ořechov</title>
+        <title>Formuláře a dokumenty | Portál občana obce Ořechov</title>
       </Helmet>
       <div className="container mx-auto px-4 py-8">
         {toast && (
@@ -129,9 +129,9 @@ const Folders: React.FC = () => {
           <div className="block md:hidden p-4">
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0 pr-2">
-                <h3 className="text-lg font-semibold text-gray-800 break-words">
-                  {folder.name}
-                </h3>
+              <h3 className="text-xl md:text-2xl font-semibold text-gray-800 break-words">
+                {folder.name}
+              </h3>
                 <p className="text-sm text-gray-500 mt-1">
                   {folder.fileCount} {folder.fileCount === 1 ? 'soubor' : 
                   folder.fileCount >= 2 && folder.fileCount <= 4 ? 'soubory' : 

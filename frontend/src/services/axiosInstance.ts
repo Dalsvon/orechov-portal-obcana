@@ -9,7 +9,6 @@ const axiosInstance = axios.create({
   withCredentials: true
 });
 
-// Add interceptors to log session cookie
 axiosInstance.interceptors.request.use(request => {
   console.log('Request cookies:', document.cookie);
   return request;

@@ -96,7 +96,7 @@ const Movefile: React.FC<MoveFileProps> = ({
               Vyberte cílovou složku pro soubor:
             </p>
             <p className="mt-2 text-gray-900 font-medium break-words">
-              "{fileName}"
+              {fileName}
             </p>
           </div>
 

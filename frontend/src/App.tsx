@@ -11,6 +11,7 @@ import Folders from './pages/Folders';
 import FolderContent from './pages/FolderContent';
 import ErrorBoundary from './components/ErrorBoundry';
 import { HelmetProvider } from 'react-helmet-async';
+import PortalHome from './pages/HomePage';
 
 const Contacts = React.lazy(() => import('./pages/Contacts'));
 const AdminLogin = React.lazy(() => import('./forms/AdminLogin'));
@@ -48,20 +49,21 @@ const App: React.FC = () => {
           <main className="flex-1 px-4 mb-16">
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
-              <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin" element={
                   <ProtectedRoute>
                     <AdminPage />
                   </ProtectedRoute>
                 } />
-                <Route path="/" element={<Folders />} />
+                <Route path="/documents" element={<Folders />} />
                 <Route path="/folder/:folderName" element={<FolderContent />} />
                 <Route path="/contacts" element={<Contacts />} />
+                <Route path="/" element={<PortalHome />} />
                 <Route path="*" element={<Error404 />} />
               </Routes>
             </Suspense>
           </main>
-
+  
           <Footer />
         </div>
       </ErrorBoundary>

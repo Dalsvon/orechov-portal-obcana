@@ -15,7 +15,6 @@ const AdminLogin: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setUsername('admin')
     setError(null);
     setIsSubmitting(true);
 
@@ -24,7 +23,7 @@ const AdminLogin: React.FC = () => {
       setIsAdmin(true);
       navigate('/');
     } catch (error: any) {
-      setError(error.response?.data?.error || 'Invalid credentials');
+      setError(error.response?.data?.error || 'Nepodařilo se prihlásit. Skuste to znovu.');
     } finally {
       setIsSubmitting(false);
     }

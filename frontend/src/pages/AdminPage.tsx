@@ -56,13 +56,11 @@ const AdminPage = () => {
       </Helmet>
       <div className="max-w-6xl mx-auto p-6">
         <div className="grid md:grid-cols-2 gap-8">
-          {/* PDF Uploader Section */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-2xl font-bold mb-6">Nahrát dokument</h2>
             <FileUploader onUploadComplete={() => {}} />
           </div>
           <div className="space-y-8">
-            {/* Password Change Form */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-2xl font-bold mb-6">Změnit heslo</h2>
               <form onSubmit={handlePasswordChange} className="space-y-4">
@@ -128,7 +126,6 @@ const AdminPage = () => {
               </form>
             </div>
 
-            {/* Logout Button */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-2xl font-bold mb-6">Odhlášení</h2>
               <button

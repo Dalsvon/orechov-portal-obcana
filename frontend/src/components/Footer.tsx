@@ -52,13 +52,11 @@ const Footer: React.FC = () => {
         flexDirection: 'column',
         gap: '2rem'
       }}>
-        {/* Container for both columns */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
           gap: '2rem'
         }}>
-          {/* Kontaktní informace */}
           <div>
             <h3 style={{ 
               fontSize: '1.125rem', 
@@ -88,8 +86,6 @@ const Footer: React.FC = () => {
               )}
             </div>
           </div>
-
-          {/* Úřední hodiny */}
           <div>
             <h3 style={{ 
               fontSize: '1.125rem', 

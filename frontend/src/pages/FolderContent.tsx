@@ -173,7 +173,7 @@ const FolderContent: React.FC = () => {
 
         <div className="mb-6 flex items-center">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/documents')}
             className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-sm flex items-center transition-colors"
           >
             ← Zpět na Formuláře a dokumenty

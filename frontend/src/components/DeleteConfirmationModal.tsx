@@ -20,7 +20,6 @@ const DeleteConfirmationModal = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-        {/* Header */}
         <div className="flex justify-between items-center p-6 border-b">
           <h2 className="text-xl font-semibold">
             Smazat {itemType === 'file' ? 'soubor' : 'složku'}
@@ -35,22 +34,14 @@ const DeleteConfirmationModal = ({
           </button>
         </div>
 
-        {/* Content */}
         <div className="p-6">
           <p className="text-gray-600">
             Opravdu chcete smazat {itemType === 'file' ? 'soubor' : 'složku'}:
           </p>
           <p className="mt-2 text-gray-900 font-medium break-words">
-            "{itemName}"
+            {itemName}
           </p>
-          
-          {itemType === 'folder' && (
-            <p className="mt-4 text-sm text-red-600">
-              Poznámka: Složku lze smazat pouze pokud je prázdná.
-            </p>
-          )}
 
-          {/* Buttons */}
           <div className="mt-6 flex justify-end gap-4">
             <button
               onClick={onClose}
