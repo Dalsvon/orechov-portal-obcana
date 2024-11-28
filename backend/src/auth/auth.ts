@@ -35,7 +35,7 @@ export const sessionMiddleware = cookieSession({
   secure: process.env.NODE_ENV === 'production',
   httpOnly: true,
   sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-  path: '/portal'
+  path: '/'
 });
 
 // Function to check if the user is authenticated for admin action
