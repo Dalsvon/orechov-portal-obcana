@@ -10,13 +10,11 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use(request => {
-  console.log('Request cookies:', document.cookie);
   return request;
 });
 
 axiosInstance.interceptors.response.use(
   response => {
-    console.log('Response cookies:', document.cookie);
     return response;
   }
 );

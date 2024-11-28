@@ -5,7 +5,7 @@ import { useRecoilValue } from 'recoil';
 import { isAdminState } from '../atoms/atoms';
 import FolderCreator from '../forms/FolderCreator';
 import Toast from '../notifications/Toast';
-import { X } from 'lucide-react';
+import { Folder, X, ChevronRight } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 
@@ -23,7 +23,6 @@ const Folders: React.FC = () => {
   const isAdmin = useRecoilValue(isAdminState);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [folderToDelete, setFolderToDelete] = useState<string | null>(null);
-
 
   const fetchFolders = async () => {
     try {
@@ -116,80 +115,53 @@ const Folders: React.FC = () => {
         <div className="mb-8">
           <FolderCreator onFolderCreated={onFolderCreated} />
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {folders.map((folder) => (
-        <div
-          key={folder.name}
-          className="group relative bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden"
-          onClick={() => handleFolderClick(folder.name)}
-          role="button"
-          tabIndex={0}
-        >
-          <div className="block md:hidden p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 min-w-0 pr-2">
-              <h3 className="text-xl md:text-2xl font-semibold text-gray-800 break-words">
-                {folder.name}
-              </h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  {folder.fileCount} {folder.fileCount === 1 ? 'soubor' : 
-                  folder.fileCount >= 2 && folder.fileCount <= 4 ? 'soubory' : 
-                  'souborů'}
-                </p>
-              </div>
-              {isAdmin && folder.fileCount === 0 && (
-                <div 
-                  onClick={(e) => handleDeleteFolder(folder.name, e)}
-                  className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 
-                          rounded-full transition-colors duration-300 flex-shrink-0 cursor-pointer"
-                  title="Smazat prázdnou složku"
-                  role="button"
-                  tabIndex={0}
-                >
-                  <X size={20} />
-                </div>
-              )}
-            </div>
-          </div>
 
-          <div className="hidden md:block aspect-square">
-            <div className="w-full h-full flex flex-col items-center justify-center p-6">
-              <div className="text-center w-full">
-                <h3 className="text-xl font-semibold text-gray-800 break-words">
-                  {folder.name}
-                </h3>
-                <p className="mt-2 text-gray-500 text-sm">
-                  {folder.fileCount} {folder.fileCount === 1 ? 'soubor' : 
-                  folder.fileCount >= 2 && folder.fileCount <= 4 ? 'soubory' : 
-                  'souborů'}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {isAdmin && folder.fileCount === 0 && (
+        <div className="bg-white rounded-lg shadow-md divide-y">
+          {folders.map((folder) => (
             <div
-              onClick={(e) => handleDeleteFolder(folder.name, e)}
-              className="hidden md:block absolute top-2 right-2 text-red-500 
-                      hover:text-red-700 p-2 rounded-full hover:bg-red-50 
-                      transition-colors duration-300 cursor-pointer"
-              title="Smazat prázdnou složku"
+              key={folder.name}
+              onClick={() => handleFolderClick(folder.name)}
+              className="group relative flex items-center p-4 hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
               role="button"
               tabIndex={0}
             >
-              <X size={20} />
+              <div className="flex-shrink-0 mr-4">
+                <Folder className="w-8 h-8 text-green-700" />
+              </div>
+              
+              <div className="flex-grow min-w-0">
+                <h3 className="text-lg font-semibold text-gray-900 truncate">
+                  {folder.name}
+                </h3>
+                <p className="text-sm text-gray-500">
+                  {folder.fileCount} {folder.fileCount === 1 ? 'soubor' : 
+                   folder.fileCount >= 2 && folder.fileCount <= 4 ? 'soubory' : 
+                   'souborů'}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-4">
+                {isAdmin && folder.fileCount === 0 && (
+                  <button
+                    onClick={(e) => handleDeleteFolder(folder.name, e)}
+                    className="opacity-0 group-hover:opacity-100 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-all duration-200"
+                    title="Smazat prázdnou složku"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
+                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors duration-200" />
+              </div>
+            </div>
+          ))}
+
+          {folders.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">Zatím zde nejsou žádné složky.</p>
             </div>
           )}
         </div>
-          ))}
-        </div>
 
-        {folders.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">Zatím zde nejsou žádné složky.</p>
-          </div>
-        )}
         {showDeleteModal && folderToDelete && (
           <DeleteConfirmationModal
             isOpen={showDeleteModal}

@@ -2,7 +2,6 @@ import { RequestHandler } from 'express';
 import { FolderRepository } from '../repositories/folder';
 import prisma from '../database/prisma';
 import { checkLength, FOLDER_NAME_MAX_LENGTH } from '../services/folderServices';
-import { create } from 'domain';
 
 const folderRepository = new FolderRepository(prisma);
 

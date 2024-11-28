@@ -14,6 +14,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import PortalHome from './pages/HomePage';
 
 const Contacts = React.lazy(() => import('./pages/Contacts'));
+const DeskPage = React.lazy(() => import('./pages/DeskPage'));
 const AdminLogin = React.lazy(() => import('./forms/AdminLogin'));
 const AdminPage = React.lazy(() => import('./pages/AdminPage'));
 
@@ -58,6 +59,7 @@ const App: React.FC = () => {
                 <Route path="/documents" element={<Folders />} />
                 <Route path="/folder/:folderName" element={<FolderContent />} />
                 <Route path="/contacts" element={<Contacts />} />
+                <Route path="/desk" element={<DeskPage />} />
                 <Route path="/" element={<PortalHome />} />
                 <Route path="*" element={<Error404 />} />
               </Routes>

@@ -14,6 +14,7 @@ import getFiles from './controllers/getFiles'
 import authRouter, { sessionMiddleware, isAuthenticated } from './auth/auth';
 import { securityHeaders } from './middleware/securityHeaders';
 import initializeSystem from './initialization/initializeSystem';
+import getRSSFeed from './controllers/getRSSFeed';
 
 const app = express();
 
@@ -66,6 +67,7 @@ app.get('/api/file/:folder/:id/download', downloadFile);
 app.get('/api/folders/:folderName/files', getFiles);
 app.get('/api/folders', getFolders);
 app.get('/api/contact', getContact);
+app.get('/api/rss', getRSSFeed);
 
 app.use(errorHandler);
 

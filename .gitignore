@@ -9,8 +9,6 @@ backend/node_modules/
 */coverage
 
 # Production
-/build
-*/build
 /dist
 */dist
 
