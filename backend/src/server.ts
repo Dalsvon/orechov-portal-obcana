@@ -19,7 +19,7 @@ import getRSSFeed from './controllers/getRSSFeed';
 const app = express();
 
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'https://sc01.fi.muni.cz',
   //origin: 'http://192.168.1.179:3000',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

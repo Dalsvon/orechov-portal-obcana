@@ -32,10 +32,10 @@ export const sessionMiddleware = cookieSession({
   name: 'session',
   keys: [process.env.SESSION_SECRET!],
   maxAge: 8 * 60 * 60 * 1000, // Will last only 8 hours
-  secure: false, // set as "process.env.NODE_ENV === 'production'" for production
+  secure: process.env.NODE_ENV === 'production',
   httpOnly: true,
   sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-  path: '/'
+  path: '/portal'
 });
 
 // Function to check if the user is authenticated for admin action
