@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: '/portal/api',
+  baseURL: '/portal',
   headers: {
     "Content-Type": "application/json"
   },
