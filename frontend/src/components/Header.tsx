@@ -24,7 +24,7 @@ const Header: React.FC = () => {
             <div className="relative -mb-16">
               <Link to="/" className="flex items-center">
                 <img 
-                  src="/orechov-logo.png" 
+                  src="/portal/orechov-logo.png" 
                   alt="Ořechov Logo" 
                   className="h-32 w-auto object-contain"
                 />
