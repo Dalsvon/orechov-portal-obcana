@@ -18,6 +18,8 @@ import getRSSFeed from './controllers/getRSSFeed';
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 app.use(cors({
   origin: 'https://sc01.fi.muni.cz/portal',
   credentials: true,
