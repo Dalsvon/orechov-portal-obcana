@@ -31,16 +31,17 @@ const router = express.Router();
 export const sessionMiddleware = cookieSession({
   name: 'session',
   keys: [process.env.SESSION_SECRET!],
-  maxAge: 8 * 60 * 60 * 1000, // Will last only 8 hours
-  secure: process.env.NODE_ENV === 'production',
+  maxAge: 8 * 60 * 60 * 1000,
+  secure: true,
   httpOnly: true,
-  sameSite: 'lax',
-  path: '/portal',
-  domain: 'sc01.fi.muni.cz'
+  sameSite: 'lax'
 });
 
 // Function to check if the user is authenticated for admin action
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction): void => {
+  console.log('Session:', req.session);
+  console.log('Cookies:', req.cookies);
+
   if (!req.session) {
     res.status(401).json({ error: 'Relace vypršela' });
     return;
