@@ -34,8 +34,9 @@ export const sessionMiddleware = cookieSession({
   maxAge: 8 * 60 * 60 * 1000, // Will last only 8 hours
   secure: process.env.NODE_ENV === 'production',
   httpOnly: true,
-  sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-  path: '/'
+  sameSite: 'lax',
+  path: '/portal',
+  domain: 'sc01.fi.muni.cz'
 });
 
 // Function to check if the user is authenticated for admin action
