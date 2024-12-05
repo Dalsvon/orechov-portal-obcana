@@ -16,9 +16,8 @@ const PortalHome = () => {
             Vítejte na Portálu občana obce Ořechov
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Cílem Portálu občana je umožnit občanům Ořechova lépe komunikovat s vedením obce a úřady.
-            Můžete zde stahovat dokumenty a formuláře obce Ořechov, najít úřední desku obce a také kontakty na vedení obce 
-            a její představitele.
+          Cílem Portálu občana je umožnit občanům Ořechova lépe komunikovat s úřady obce.
+          Můžete zde stahovat dokumenty a formuláře obce Ořechov, najít úřední desku obce a také kontakty na obecní úřad a představitele obce.
           </p>
         </div>
 

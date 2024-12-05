@@ -20,8 +20,8 @@ const Header: React.FC = () => {
     <div className="relative mb-12">
       <header className="bg-green-600 shadow-md w-full relative"> 
         <div className="container mx-auto px-4 py-8">
-          <nav className="flex items-center justify-between">
-            <div className="relative -mb-16">
+          <nav className="flex items-center justify-between max-w-[1400px] mx-auto">
+            <div className="relative -mb-16 w-[320px]">
               <Link to="/" className="flex items-center">
                 <img 
                   src="/portal/orechov-logo.png" 
@@ -31,7 +31,7 @@ const Header: React.FC = () => {
               </Link>
             </div>
             
-            <div className="hidden lg:flex items-center space-x-14 ml-auto">
+            <div className="hidden lg:flex items-center gap-14 flex-1 justify-center">
               <Link 
                 to="/" 
                 className="text-white hover:text-green-200 font-semibold text-xl transition duration-150 ease-in-out py-2 border-b-2 border-transparent hover:border-white"

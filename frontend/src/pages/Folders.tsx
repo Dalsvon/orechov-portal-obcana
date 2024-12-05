@@ -32,7 +32,7 @@ const Folders: React.FC = () => {
       setFolders(response.data);
     } catch (error) {
       console.error('Error fetching folders:', error);
-      setError(`Nepodařilo se nahrát soubory. ${error instanceof Error ? error.message : String(error)}`);
+      setError(`Nepodařilo se nahrát soubory.`);
     } finally {
       setIsLoading(false);
     }

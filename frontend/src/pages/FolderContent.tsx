@@ -6,7 +6,7 @@ import axiosInstance from '../services/axiosInstance';
 import Movefile from '../components/FileMove';
 import FileUploader from '../forms/FileUploader';
 import Toast from '../notifications/Toast';
-import { Plus, X } from 'lucide-react';
+import { ArrowLeft, Download, Globe, Move, Plus, Trash2, X } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 
@@ -174,13 +174,14 @@ const FolderContent: React.FC = () => {
         <div className="mb-6 flex items-center">
           <button
             onClick={() => navigate('/documents')}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-sm flex items-center transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all"
           >
-            ← Zpět na Formuláře a dokumenty
+            <ArrowLeft className="w-4 h-4" />
+            Zpět na Formuláře a dokumenty
           </button>
         </div>
 
-        <div className="bg-white rounded-lg shadow">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <h2 className="text-2xl font-bold p-6 border-b break-words">
             {decodeURIComponent(folderName || '')}
           </h2>
@@ -190,16 +191,24 @@ const FolderContent: React.FC = () => {
               Tato složka je prázdná
             </div>
           ) : (
-            <div className="divide-y">
+            <div className="divide-y divide-gray-200">
               {files.map((file) => (
                 <div
                   key={file.id}
                   className="p-6 hover:bg-gray-50 transition-colors"
                 >
                   <div className="mb-4">
-                    <h3 className="text-lg font-semibold mb-2 break-words">
-                      {file.name}
-                    </h3>
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="text-lg font-semibold mb-2 break-words">
+                        {file.name}
+                      </h3>
+                      {isAdmin && file.fromWebsite && (
+                        <div className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
+                          <Globe className="w-3 h-3" />
+                          Z webové stránky obce
+                        </div>
+                      )}
+                    </div>
                     {file.description && (
                       <p className="text-gray-600 mb-2 whitespace-pre-line break-words">
                         {formatDescription(file.description)}
@@ -211,11 +220,12 @@ const FolderContent: React.FC = () => {
                     </div>
                   </div>
                   
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-3">
                     <button
                       onClick={() => handleDownload(file.id)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all shadow-sm"
                     >
+                      <Download className="w-4 h-4" />
                       Stáhnout
                     </button>
                     
@@ -223,29 +233,19 @@ const FolderContent: React.FC = () => {
                       <>
                         <button
                           onClick={() => setSelectedFile({ id: file.id, name: file.name })}
-                          className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all shadow-sm"
                         >
+                          <Move className="w-4 h-4" />
                           Přesunout
                         </button>
                         <button
                           onClick={() => handleDelete(file.id, file.name)}
-                          className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all shadow-sm"
                         >
+                          <Trash2 className="w-4 h-4" />
                           Smazat
                         </button>
                       </>
-                    )}
-                    {showDeleteModal && (
-                      <DeleteConfirmationModal
-                        isOpen={showDeleteModal}
-                        onClose={() => {
-                          setShowDeleteModal(false);
-                          setItemToDelete(null);
-                        }}
-                        onConfirm={handleConfirmDelete}
-                        itemName={itemToDelete?.name || ''}
-                        itemType="file" // or "folder"
-                      />
                     )}
                   </div>
                 </div>
@@ -257,9 +257,9 @@ const FolderContent: React.FC = () => {
             <div className="p-6 border-t flex justify-center">
               <button
                 onClick={() => setShowUploader(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all shadow-sm"
               >
-                <Plus size={20} />
+                <Plus className="w-5 h-5" />
                 Přidat soubor
               </button>
             </div>
@@ -271,11 +271,10 @@ const FolderContent: React.FC = () => {
                 <h3 className="text-lg font-semibold">Přidat nový soubor</h3>
                 <button
                   onClick={() => setShowUploader(false)}
-                  className="flex items-center gap-2 px-3 py-1 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+                  className="inline-flex items-center gap-2 p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all"
                   title="Zrušit přidávání"
                 >
-                  <X size={20} />
-                  Zrušit
+                  <X className="w-5 h-5" />
                 </button>
               </div>
               <FileUploader 
@@ -293,6 +292,19 @@ const FolderContent: React.FC = () => {
             fileName={selectedFile.name}
             currentFolder={folderName!}
             onClose={() => setSelectedFile(null)}
+          />
+        )}
+
+        {showDeleteModal && itemToDelete && (
+          <DeleteConfirmationModal
+            isOpen={showDeleteModal}
+            onClose={() => {
+              setShowDeleteModal(false);
+              setItemToDelete(null);
+            }}
+            onConfirm={handleConfirmDelete}
+            itemName={itemToDelete.name}
+            itemType="file"
           />
         )}
       </div>
