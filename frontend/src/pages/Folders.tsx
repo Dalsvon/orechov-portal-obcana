@@ -29,7 +29,10 @@ const Folders: React.FC = () => {
       setIsLoading(true);
       setError(null);
       const response = await axiosInstance.get<FolderData[]>('/api/folders');
-      setFolders(response.data);
+      const sortedFolders = response.data.sort((a, b) => 
+        a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+      );
+      setFolders(sortedFolders);
     } catch (error) {
       console.error('Error fetching folders:', error);
       setError(`Nepodařilo se nahrát soubory.`);

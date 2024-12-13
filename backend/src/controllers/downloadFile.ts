@@ -38,9 +38,14 @@ const downloadFile: RequestHandler = async (req, res, next) => {
 
     const sanitizedFileName = sanitizeFileName(file.name);
 
-    res.setHeader('Content-Type', file.mimeType);
-    res.setHeader('Content-Disposition', `attachment; filename="${sanitizedFileName}"`);
-    res.setHeader('Content-Length', file.fileSize);
+    res.set({
+      'Content-Type': file.mimeType,
+      'Content-Disposition': `attachment; filename="${sanitizedFileName}"`,
+      'Content-Length': file.fileSize,
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
 
     fileStream.pipe(res);
 

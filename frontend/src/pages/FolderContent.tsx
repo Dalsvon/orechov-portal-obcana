@@ -41,7 +41,10 @@ const FolderContent: React.FC = () => {
       const response = await axiosInstance.get<File[]>(
         `/api/folders/${encodeURIComponent(folderName)}/files`
       );
-      setFiles(response.data);
+      const sortedFiles = response.data.sort((a, b) => 
+        a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+      );
+      setFiles(sortedFiles);
     } catch (error) {
       console.error('Error fetching folder content:', error);
       setError('Nepodařilo se načíst obsah složky');
