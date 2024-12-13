@@ -37,8 +37,8 @@ const downloadFile: RequestHandler = async (req, res, next) => {
     const sanitizedFileName = sanitizeFileName(file.name);
 
     res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${sanitizedFileName}"`,
+      'Content-Type': file.mimeType,
+      'Content-Disposition': `attachment; filename="dsadsa"`,
       'Content-Length': file.fileSize,
       'Cache-Control': 'no-cache, no-store, must-revalidate',
       'Pragma': 'no-cache',
