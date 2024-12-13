@@ -38,10 +38,8 @@ const downloadFile: RequestHandler = async (req, res, next) => {
 
     const sanitizedFileName = sanitizeFileName(file.name);
 
-    console.log('Setting response headers:', file.mimeType);
-
     res.set({
-      'Content-Type': file.mimeType,
+      'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="${sanitizedFileName}"`,
       'Content-Length': file.fileSize,
       'Cache-Control': 'no-cache, no-store, must-revalidate',
