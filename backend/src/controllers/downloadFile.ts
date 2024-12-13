@@ -34,18 +34,24 @@ const downloadFile: RequestHandler = async (req, res, next) => {
       return;
     }
 
+    const fileStream = Readable.from(file.content);
+
     const sanitizedFileName = sanitizeFileName(file.name);
 
     res.set({
       'Content-Type': file.mimeType,
-      'Content-Disposition': `attachment; filename="dsadsa"`,
+      'Content-Disposition': `attachment; filename="${sanitizedFileName}"`,
       'Content-Length': file.fileSize,
       'Cache-Control': 'no-cache, no-store, must-revalidate',
       'Pragma': 'no-cache',
       'Expires': '0'
     });
 
-    res.send(file.content);
+    fileStream.pipe(res);
+
+    fileStream.on('error', (error) => {
+      res.status(500).end();
+    });
 
   } catch (error) {
     res.status(500).json({ 

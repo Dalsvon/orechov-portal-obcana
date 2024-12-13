@@ -42,11 +42,12 @@ export const formatDate = (date: Date): string => {
 
 // Prepares and sanitizes file name to be used for download of the file
 export const sanitizeFileName = (fileName: string): string => {
+  // Since extension is stored separately, we just sanitize the name
   return fileName
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/\s+/g, '-')
-    .replace(/[^a-zA-Z0-9\-\.]/g, '')
+    .replace(/[^a-zA-Z0-9\-]/g, '') // This will also remove dots
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '');
 };
