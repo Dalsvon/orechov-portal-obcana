@@ -15,9 +15,6 @@ export const securityHeaders = (req: Request, res: Response, next: NextFunction)
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('X-Content-Type-Options', 'nosniff');
 
-  // HSTS (uncomment in production with HTTPS)
-  // res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-
   res.setHeader('Referrer-Policy', 'same-origin');
 
   res.setHeader(

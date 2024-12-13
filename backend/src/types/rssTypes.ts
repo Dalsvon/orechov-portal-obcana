@@ -1,5 +1,4 @@
  export interface RSSItem {
-    //guid: [string];
     guid: [{ _: string; $: { isPermaLink: string } }] | [string];
     link: [string];
     category: [string];
