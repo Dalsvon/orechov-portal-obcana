@@ -34,8 +34,6 @@ const downloadFile: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const fileStream = Readable.from(file.content);
-
     const sanitizedFileName = sanitizeFileName(file.name);
 
     res.set({
@@ -47,11 +45,7 @@ const downloadFile: RequestHandler = async (req, res, next) => {
       'Expires': '0'
     });
 
-    fileStream.pipe(res);
-
-    fileStream.on('error', (error) => {
-      res.status(500).end();
-    });
+    res.send(file.content);
 
   } catch (error) {
     res.status(500).json({ 
