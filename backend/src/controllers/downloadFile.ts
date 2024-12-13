@@ -11,10 +11,6 @@ const downloadFile: RequestHandler = async (req, res, next) => {
   try {
     const { folder, id } = req.params;
 
-    res.status(400).json({ 
-      error: 'Chybí identifikátor složky nebo souboru' 
-    });
-
     if (!folder || !id) {
       res.status(400).json({ 
         error: 'Chybí identifikátor složky nebo souboru' 
