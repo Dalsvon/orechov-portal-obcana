@@ -119,7 +119,7 @@ const Footer: React.FC = () => {
           color: '#666',
           fontSize: '0.875rem'
         }}>
-          © 2002-2024 Obec Ořechov
+          © 2024 Obec Ořechov
         </div>
       </div>
     </footer>
